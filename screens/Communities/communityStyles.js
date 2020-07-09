@@ -5,7 +5,7 @@ const styles = StyleSheet.create({
   cover: {
     backgroundColor: "#DDDfff",
     width: "100%",
-    height: 166,
+    height: 110,
   },
   coverIcon: {
     position: "absolute",
@@ -14,20 +14,26 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   profilePic: {
-    alignItems: "center",
-    marginTop: -60,
+    marginLeft: 10,
+    marginTop: -20,
+  },
+  editCommunity: {
+    position: 'relative',
+    top: 10,
+    right: 10
+  },
+  textContainer: {
+    marginLeft: 5,
+    marginTop: 4,
+    flex: 1
   },
   name: {
-    fontSize: 26,
+    fontSize: 21,
     fontWeight: "bold",
-    textAlign: "center",
-    letterSpacing: 2,
   },
   description: {
     color: "#555",
-    fontSize: 21,
-    textAlign: "center",
-    letterSpacing: 1,
+    fontSize: 16,
   },
   item: {
     borderColor: $grey_2,
@@ -41,7 +47,7 @@ const styles = StyleSheet.create({
   communityName: {
     fontSize: 23,
     marginLeft: 15,
-    color: headlineColor
+    color: headlineColor,
   },
   communityDesc: {
     fontSize: 17,

@@ -78,7 +78,7 @@ export default class CommunitiesList extends React.Component {
 
   render() {
     return (
-      <View style={{ marginTop: StatusBar.currentHeight, flex: 1 }}>
+      <View style={{ paddingTop: StatusBar.currentHeight, flex: 1 }}>
         <Header
           title="Your Communities"
           onPress={() => this.props.navigation.navigate("CreateCommunity")}
@@ -90,6 +90,7 @@ export default class CommunitiesList extends React.Component {
               onRefresh={() => this.refreshScrollView()}
             />
           }
+          style={{flex: 1, marginBottom: 50}}
         >
           <CommunityListElements
             loaded={this.state.loaded}

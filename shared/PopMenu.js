@@ -1,48 +1,60 @@
-import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
-import { Icon } from 'react-native-elements'
-import Menu, { MenuItem } from 'react-native-material-menu';
+import React from "react";
+import { View, TouchableOpacity } from "react-native";
+import { Icon } from "react-native-elements";
+import Menu, { MenuItem } from "react-native-material-menu";
+import { secondColor } from "./constants";
 
 class PopMenu extends React.PureComponent {
-    _menu = null;
+  _menu = null;
 
-    setMenuRef = ref => {
-        this._menu = ref;
-    };
+  setMenuRef = (ref) => {
+    this._menu = ref;
+  };
 
-    hideMenu = () => {
-        this._menu.hide();
-    };
+  hideMenu = () => {
+    this._menu.hide();
+  };
 
-    showMenu = () => {
-        this._menu.show();
-    };
+  showMenu = () => {
+    this._menu.show();
+  };
 
-    render() {
-        return (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <Menu
-                    ref={this.setMenuRef}
-                    button={
-                        <TouchableOpacity onPress={this.showMenu}>
-                            <Icon name='kebab-vertical' type='octicon' 
-                            color={this.props.dark ? '#555' : '#FFF'} 
-                            size={this.props.size ? this.props.size : 30} />
-                        </TouchableOpacity>
-                    }
-                >
-                    <MenuItem onPress={() => {
-                        this.props.onPress1()
-                        this.hideMenu()
-                    }}>{this.props.item1}</MenuItem>
-                    <MenuItem onPress={() => {
-                        this.props.onPress2()
-                        this.hideMenu()
-                    }}>{this.props.item2}</MenuItem>
-                </Menu>
-            </View>
-        );
-    }
+  render() {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Menu
+          ref={this.setMenuRef}
+          button={
+            <TouchableOpacity onPress={this.showMenu}>
+              <Icon
+                name="kebab-vertical"
+                type="octicon"
+                color={this.props.dark ? secondColor : "#FFF"}
+                size={this.props.size ? this.props.size : 30}
+              />
+            </TouchableOpacity>
+          }
+        >
+          <MenuItem
+            onPress={() => {
+              this.props.onPress1();
+              this.hideMenu();
+            }}
+          >
+            {this.props.item1}
+          </MenuItem>
+          <MenuItem
+            onPress={() => {
+              this.props.onPress2();
+              this.hideMenu();
+            }}
+          >
+            {this.props.item2}
+          </MenuItem>
+        </Menu>
+      </View>
+    );
+  }
 }
 
 export default PopMenu;

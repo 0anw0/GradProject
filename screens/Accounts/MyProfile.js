@@ -116,9 +116,7 @@ export default class MyProfile extends React.Component {
           </View>
           <TouchableOpacity
             style={styles.listBox}
-            onPress={() =>
-              this.navigate("FriendsList", { friends: this.state.friends })
-            }
+            onPress={() => <ListModal />}
           >
             <View>
               <View style={styles.titleBox}>

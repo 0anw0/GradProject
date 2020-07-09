@@ -81,7 +81,7 @@ export default class PostElements extends React.Component {
 
     render() {
         return (
-            <View style={{ marginBottom: 30 }}>
+            <View style={{ marginBottom: 15, flex: 1 }}>
                 <Post
                     item={this.item}
 

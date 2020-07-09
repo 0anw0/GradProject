@@ -81,10 +81,10 @@ export default class NewsFeed extends React.Component {
 
   render() {
     return (
-      <View style={{ marginTop: StatusBar.currentHeight, flex: 1 }}>
+      <View style={{ paddingTop: StatusBar.currentHeight, flex: 1 }}>
         <WelcomeHeader />
         <ScrollView
-          style={{ padding: 5 }}
+          style={{ padding: 12, flex: 1, marginBottom: 60 }}
           refreshControl={
             <RefreshControl
               refreshing={this.state.refreshing}

@@ -1,6 +1,8 @@
 import React from "react";
+import * as firebase from 'firebase'
 import { View, Text, Image, StyleSheet } from "react-native";
 import { secondColor, $grey_2, $grey_1 } from "./constants";
+import Avatar from "./Avatar";
 
 export default class WelcomeHeader extends React.Component {
   render() {
@@ -8,6 +10,18 @@ export default class WelcomeHeader extends React.Component {
       <View style={styles.header}>
         <Text style={styles.headerHello}>Hello,</Text>
         <Text style={styles.headerUser}>Ahmed!</Text>
+        <View
+          style={{ position: "relative", left: 125 }}
+        >
+          <Avatar
+            width={40}
+            height={40}
+            uri={firebase.auth().currentUser.photoURL || 'http://placehold.it/45'}
+            borderWidth={0.8}
+            borderColor={secondColor}
+          />
+        </View>
+        <Avatar />
         {/* 
           <Image  
           source={require("../assets/logo.png")}

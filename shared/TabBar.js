@@ -50,7 +50,7 @@ export default class TabBar extends React.Component {
             name="inbox"
             size={26}
             color={this.active === "inbox" ? secondColor : $grey_1}
-            onPress={() => this.navigate('RecentChats')}
+            onPress={() => this.navigate("RecentChats")}
           />
           <Icon
             type="feather"
@@ -123,10 +123,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   newPostContainer: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     borderColor: secondColor,
     borderWidth: 2,
     borderRadius: 50,
-    padding: 1
+    padding: 1,
   },
 });
