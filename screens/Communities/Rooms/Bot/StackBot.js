@@ -1,23 +1,23 @@
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
-import LaunchBot from './launchBot'
-import Room from './start'
-import ChatBot_Chat from './ChatBot_Chat'
-import commandList from "./commandList";
-import chatBot from './ChatSimple'
-import LogIn from './LogIn'
-import SecondPageLaunch from './SecondPageLaunch'
-import FlatListRender from './FlatListRender'
-import queryExample from './queryExample'
 
-const botStack = createStackNavigator({
-  LogIn: { screen: LogIn },
-  Room: { screen: Room },
+import SecondPageLaunch from './SecondPageLaunch'
+import commandList from "./commandList";
+import BotDirector from './botDirector'
+import LaunchBot from './launchBot'
+import chatBot from './ChatSimple'
+
+const BotStack = createStackNavigator({
+  botDirector: { screen: BotDirector },
   launchBot: { screen: LaunchBot },
-  SecondPageLaunch : {screen : SecondPageLaunch},
+  SecondPageLaunch: { screen: SecondPageLaunch },
   commandList: { screen: commandList },
   chatBot: { screen: chatBot },
-  queryExample: {screen : queryExample}
-});
+},
+  {
+    headerMode: 'none',
+    unmountInactiveRoutes: true
+  }
+)
 
-export default createAppContainer(botStack);
+export default createAppContainer(BotStack);

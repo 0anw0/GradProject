@@ -1,8 +1,10 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableHighlight } from "react-native";
-import { secondColor, $grey_2, $grey_3, $grey_1 } from "../shared/constants";
+import { secondColor, $grey_1 } from "../shared/constants";
 import { Icon } from "react-native-elements";
+
 import firebase from "../services/firebaseConfig";
+import styles from "./tabStyles";
 
 export default class TabBar extends React.Component {
   constructor(props) {
@@ -40,7 +42,7 @@ export default class TabBar extends React.Component {
           {this.props.post && (
             <TouchableHighlight
               style={styles.newPostContainer}
-              onPress={() => alert("Create Post")}
+              onPress={() => this.navigate('CreatePost', { headingFromCommunity: false })}
             >
               <Icon type="feather" name="plus" size={25} color={secondColor} />
             </TouchableHighlight>
@@ -103,30 +105,3 @@ export default class TabBar extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
-  tab: {
-    height: 60,
-    width: "100%",
-    backgroundColor: "#FFF",
-    borderWidth: 1,
-    borderColor: $grey_2,
-    borderTopStartRadius: 15,
-    borderTopEndRadius: 15,
-    position: "absolute",
-    bottom: 0,
-  },
-  iconContainer: {
-    flexDirection: "row",
-    paddingHorizontal: 20,
-    justifyContent: "space-between",
-    alignItems: "center",
-    flex: 1,
-  },
-  newPostContainer: {
-    backgroundColor: "#FFF",
-    borderColor: secondColor,
-    borderWidth: 2,
-    borderRadius: 50,
-    padding: 1,
-  },
-});

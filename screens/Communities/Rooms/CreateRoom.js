@@ -1,10 +1,13 @@
 import React from "react";
-import { TextInput, StatusBar, View, StyleSheet, Button, FlatList, TouchableOpacity } from 'react-native';
+import { TextInput, StatusBar, View, Button, FlatList, TouchableOpacity } from 'react-native';
 import { Avatar, Icon, Text } from 'react-native-elements'
-import Header from '../../../shared/Header'
-import { secondColor } from '../../../shared/constants'
+
 import { _launchCameraRoll, _takePhoto } from '../../../services/CameraAPI'
 import firebase from '../../../services/firebaseConfig'
+import { secondColor } from '../../../shared/constants'
+import Header from '../../../shared/Header'
+import styles from "./roomStyles";
+
 
 export default class CreateRoom extends React.Component {
     constructor(props) {
@@ -20,7 +23,6 @@ export default class CreateRoom extends React.Component {
             avatar: ''
         }
     }
-
 
     pickAvatar = () => {
         let promObject = _launchCameraRoll()
@@ -42,6 +44,9 @@ export default class CreateRoom extends React.Component {
             this.props.navigation.getParam('selMembers').forEach(item => {
                 firebase.database().ref(`rooms/${this.commKey}/${res.key}/members/${item.key}`).set({
                     admin: item.key === this.adminID ? true : false
+                })
+                firebase.database().ref(`authenicatedUsers/${item.key}/rooms`).push({
+                    roomKey: res.key
                 })
             })
         })
@@ -95,38 +100,4 @@ export default class CreateRoom extends React.Component {
         );
     }
 }
-
-const styles = StyleSheet.create({
-    newRoomTextInput: {
-        borderWidth: 1,
-        borderColor: secondColor,
-        padding: 5,
-        marginBottom: 5,
-        borderRadius: 2
-    },
-    avatarContainer: {
-        alignItems: 'center',
-        marginBottom: 10
-    },
-    addMembers: {
-        marginLeft: 5,
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 15
-    },
-    addMembersTxt: {
-        fontSize: 23,
-        color: '#555',
-        marginLeft: 5
-    },
-    list: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 5,
-        paddingLeft: 10,
-        borderWidth: 1,
-        borderColor: '#BBB',
-    }
-});
-
 

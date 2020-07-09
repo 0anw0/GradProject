@@ -4,10 +4,11 @@ import * as firebase from "firebase";
 
 import listenForPosts from "../shared/postItems/listenForPosts";
 import { firebaseConfig } from "../services/firebaseConfig";
-import RenderPosts from "../shared/postItems/renderPosts";
 import Announcement from "../shared/postItems/Announcement";
-import Tab from "../shared/TabBar";
+import RenderPosts from "../shared/postItems/renderPosts";
 import WelcomeHeader from "../shared/WelcomeHeader";
+import Middle from "../shared/FloatingIcons/Middle";
+import Tab from "../shared/TabBar";
 
 !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
 
@@ -82,7 +83,7 @@ export default class NewsFeed extends React.Component {
   render() {
     return (
       <View style={{ paddingTop: StatusBar.currentHeight, flex: 1 }}>
-        <WelcomeHeader />
+        <WelcomeHeader navigate={this.navigate}/>
         <ScrollView
           style={{ padding: 12, flex: 1, marginBottom: 60 }}
           refreshControl={
@@ -107,6 +108,7 @@ export default class NewsFeed extends React.Component {
             headingFromCommunity={false}
           />
         </ScrollView>
+
         <Tab active="newsfeed" navigation={this.props.navigation} post />
       </View>
     );

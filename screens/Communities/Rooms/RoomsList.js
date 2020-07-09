@@ -1,8 +1,18 @@
 import React from "react";
-import { FlatList, Text, View, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
+import { FlatList, Text, View, TouchableOpacity, StatusBar } from 'react-native';
 import { Avatar } from 'react-native-elements'
-import Header from '../../../shared/Header'
+
 import firebase from '../../../services/firebaseConfig'
+import Header from '../../../shared/Header'
+import styles from "./roomStyles";
+
+function SubButton({ actionFunc, ButtonTxt }) {
+    return (
+        <TouchableOpacity onPress={actionFunc}>
+            <Text style={styles.option}>{ButtonTxt}</Text>
+        </TouchableOpacity>
+    )
+}
 
 export default class RoomsList extends React.Component {
     constructor(props) {
@@ -15,15 +25,6 @@ export default class RoomsList extends React.Component {
             rooms: [],
             newRoom: ''
         }
-    }
-
-    openMessages(room) {
-        this.navigate('ChatScreen', {
-            roomKey: room.key,
-            roomName: room.name,
-            roomAvatar: room.avatar,
-            communityKey: this.communityKey
-        });
     }
 
     componentDidMount() {
@@ -44,6 +45,24 @@ export default class RoomsList extends React.Component {
         });
     }
 
+    openMessages(room) {
+        this.navigate('ChatScreen', {
+            roomKey: room.key,
+            roomName: room.name,
+            roomAvatar: room.avatar,
+            communityKey: this.communityKey
+        });
+    }
+
+    updateRoom(roomUP) {
+        this.props.navigation.navigate('EditRoomProfile', {
+            roomKey: roomUP.key,
+            roomAvatar: roomUP.avatar,
+            roomName: roomUP.name,
+            communityKey: this.communityKey,
+        })
+    }
+
     render() {
         return (
             <View style={{ marginTop: StatusBar.currentHeight, flex: 1 }}>
@@ -60,15 +79,18 @@ export default class RoomsList extends React.Component {
                             <View underlayColor="#fff" style={styles.item}>
                                 <Text style={styles.roomName}>{item.name}</Text>
                                 <View style={{ flexDirection: 'row', marginTop: 5, marginLeft: 5 }}>
-                                    <TouchableOpacity onPress={() => this.openMessages(item)}>
-                                        <Text style={styles.option}>Chat</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={() => this.navigate('BotStack')}>
-                                        <Text style={styles.option}>Chatbot</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={() => this.navigate('BubbleStack')}>
-                                        <Text style={styles.option}>Bubble</Text>
-                                    </TouchableOpacity>
+                                    <SubButton actionFunc={() => this.openMessages(item)}
+                                        ButtonTxt={'chat'} />
+                                    <SubButton actionFunc={() => this.navigate('BotStack' , {
+                                        communityKey: this.communityKey, roomKey: item.key
+                                    }) }
+                                        ButtonTxt={'Chatbot'} />
+                                    <SubButton actionFunc={() => this.navigate('BubbleStack',{
+                                        communityKey: this.communityKey, roomKey: item.key
+                                    })}
+                                        ButtonTxt={'Bubble'} />
+                                    <SubButton actionFunc={() => this.updateRoom(item)}
+                                        ButtonTxt={'setting'} />
                                 </View>
                             </View>
                         </View>
@@ -78,26 +100,3 @@ export default class RoomsList extends React.Component {
         );
     }
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'row',
-        backgroundColor: '#EEE',
-        alignItems: 'center',
-        paddingLeft: 25,
-        paddingVertical: 15,
-        marginBottom: 10
-    },
-    item: {
-        marginLeft: 10
-    },
-    roomName: {
-        fontSize: 21,
-        fontWeight: 'bold'
-    },
-    option: {
-        fontSize: 16,
-        color: 'blue',
-        marginRight: 15,
-    }
-})

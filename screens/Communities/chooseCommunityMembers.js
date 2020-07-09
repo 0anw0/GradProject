@@ -54,7 +54,6 @@ export default class ChooseCommunityMembers extends React.Component {
                     })
                 this.setState({ friends })
             }
-
         })
     }
 
@@ -82,33 +81,6 @@ export default class ChooseCommunityMembers extends React.Component {
 
         this.setPickedFriendsState(afterSelectionFriends)
     }
-    /*
-        deleteChosenFriend(friend) {
-            let friends = this.state.friends
-            let afterSelectionFriends = []
-            for (const child in friends) {
-                if (friend.key == friends[child].key && friend.key != friends[0].key) {
-    
-                    afterSelectionFriends.push({
-                        name: friend.name,
-                        image: friend.image,
-                        key: friend.key,
-                        selected: false,
-                        adminRole: false
-                    })
-                }
-                else {
-                    afterSelectionFriends.push(friends[child])
-                }
-            }
-    
-            this.setState({
-                friends: afterSelectionFriends
-            })
-    
-            this.setPickedFriendsState(afterSelectionFriends)
-        }*/
-
     render() {
         return (
             <View>

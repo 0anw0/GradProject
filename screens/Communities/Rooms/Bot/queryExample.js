@@ -69,7 +69,7 @@ export default class queryExample extends React.Component {
       queryUser1 = commandArray[1].toLowerCase();
       this.findUser(queryType, queryUser1, '', false, keyWord);
     }
-  };
+  }
 
   findUser = (queryType, queryUser1, queryUser2, fOrN, keyWord) => {
     let location = 'authenticatedUsers/'; //users of a room or a community mainly
