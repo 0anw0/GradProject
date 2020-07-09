@@ -7,7 +7,6 @@ import { firebaseConfig } from "../services/firebaseConfig";
 import Announcement from "../shared/postItems/Announcement";
 import RenderPosts from "../shared/postItems/renderPosts";
 import WelcomeHeader from "../shared/WelcomeHeader";
-import Middle from "../shared/FloatingIcons/Middle";
 import Tab from "../shared/TabBar";
 
 !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
