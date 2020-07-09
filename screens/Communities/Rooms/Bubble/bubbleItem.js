@@ -10,7 +10,6 @@ import styles from "./bubbleStyles";
 class BubbleItem extends React.Component {
     constructor(props) {
         super(props)
-        this.currentUid = firebase.auth().currentUser.uid || ''
         this.item = this.props.item
         this.numOfItems = this.props.numOfItems
         this.state = {
@@ -19,11 +18,18 @@ class BubbleItem extends React.Component {
             showReplyNumber: 0,
             replies: [],
             fullName: '',
-            showReactorSection: false
+            showReactorSection: false,
+            currentUid: ''
         }
     }
 
     componentDidMount() {
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                this.setState({ currentUid: user.uid })
+            }
+        });
+
         let fullName
         firebase.database()
             .ref(`authenticatedUsers/${this.currentUid}/fullName`)
@@ -66,7 +72,7 @@ class BubbleItem extends React.Component {
                         Dimensions.get('window').width * 0.05
             }]}>
 
-                <BubbleContent item={this.item} />
+                <BubbleContent item={this.item} currentUid={this.state.currentUid} />
 
                 <View style={styles.bubbleFooter}>
                     <TouchableOpacity onPress={this.toggleShowReply}>

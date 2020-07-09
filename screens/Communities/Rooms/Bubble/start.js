@@ -22,7 +22,8 @@ export default class BubbleHome extends Component {
             bubbles: [],
             loaded: false,
             existBubbles: true,
-            showReplySection: false
+            showReplySection: false,
+            currentUid:''
         }
     }
 
@@ -31,6 +32,13 @@ export default class BubbleHome extends Component {
         this.setState({ communityKey, roomKey })
 
         getBubbleKeys(communityKey, roomKey, this.setBubbleState)
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                this.setState({ currentUid: user.uid })
+            }
+        });
+
     }
 
     setBubbleState = (value) => {

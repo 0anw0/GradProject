@@ -5,18 +5,26 @@ import * as firebase from "firebase";
 export default class createBubble extends React.Component {
     constructor() {
         super()
-        this.uuid = firebase.auth().currentUser.uid
+        this.uuid = firebase.auth().currentUser.uid || 0
         this.state = {
             bubbleTxt: '',
             sentMsg: false,
             communityKey: '',
-            roomKey: ''
+            roomKey: '',
+            currentUid:''
         }
     }
 
     componentDidMount() {
         let { communityKey, roomKey } = this.props.navigation.state.params
         this.setState({ communityKey, roomKey })
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                this.setState({ currentUid: user.uid })
+            }
+        });
+
     }
 
     handleMsg = (bubbleTxt) => { this.setState({ bubbleTxt: bubbleTxt }) }
@@ -30,13 +38,13 @@ export default class createBubble extends React.Component {
             uuid: uuid,
             sentMsg: sentMsg,
             timestamp: firebase.database.ServerValue.TIMESTAMP,
-            loveNumber: 0 , 
+            loveNumber: 0,
             replyNumber: 0
         }).then((res) => {
             firebase.database()
-            .ref(`rooms/${communityKey}/${roomKey}/Bubbles/`).push({
-                bubbleKey: res.key
-            })
+                .ref(`rooms/${communityKey}/${roomKey}/Bubbles/`).push({
+                    bubbleKey: res.key
+                })
         }).catch((error) => {
             console.log('error ', error)
         })

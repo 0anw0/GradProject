@@ -6,9 +6,7 @@ import moment from "moment";
 
 import styles from "./bubbleStyles";
 
-let currentUid = firebase.auth().currentUser.uid || ''
-
-function BubbleContent({ item }) {
+function BubbleContent({ item ,currentUid}) {
 
     let current = new Date().getTime()
     let createdAt = item.timestamp

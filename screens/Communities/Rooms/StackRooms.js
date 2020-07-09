@@ -4,7 +4,7 @@ import CreateRoom from './CreateRoom'
 import ChooseRoomMembers from './ChooseRoomMembers'
 import RoomMembers from './RoomMembers'
 import ChatScreen from './ChatScreen'
-//import BubbleStack from './Bubble/StackBubble'
+import BubbleStack from './Bubble/StackBubble'
 import BotStack from './Bot/StackBot'
 import UploadedMediaStack from './UploadedMedia/StackUploadedMedia'
 
@@ -16,7 +16,7 @@ const roomsStack = createStackNavigator(
         RoomMembers,
         ChatScreen,
         UploadedMediaStack,
-        //BubbleStack,
+        BubbleStack,
         BotStack
     },
     {
