@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet } from "react-native";
+import { secondColor } from "../../../shared/constants";
 
 const styles = StyleSheet.create({
     container: {

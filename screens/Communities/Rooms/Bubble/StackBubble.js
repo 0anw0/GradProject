@@ -1,16 +1,14 @@
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
-import Room from './start'
-import Bubble from './Bubble'
+import BubbleHome from './start'
 import createBubble from "./createBubble";
-import bubbleExtend from "./bubbleExtend";
 
 
 const MainNavigator = createStackNavigator({
-  Room: { screen: Room },
+  bubbleHome: { screen: BubbleHome },
   createBubble: {screen: createBubble},
-  Bubble: { screen: Bubble },
-  bubbleExtend: {screen: bubbleExtend}, 
+},{
+  headerMode:"none"
 });
 
 export default MainNavigator;

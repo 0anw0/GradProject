@@ -1,69 +1,44 @@
-import React, { Component } from "react";
-import { View, Button, TextInput, Alert } from "react-native";
+import React from "react";
+import { View, Button, TextInput, StatusBar } from "react-native";
 import * as firebase from "firebase";
 
 export default class createBubble extends React.Component {
     constructor() {
         super()
+        this.uuid = firebase.auth().currentUser.uid
         this.state = {
-            RoomName: '',
-            msgToBubble: '',
+            bubble: '',
             userId: 0,
-            comment: 'hi',
-            sentMsg: true
+            sentMsg: false,
+            communityKey: '',
+            roomKey: ''
         }
     }
-    UNSAFE_componentWillMount() {
-        const { params } = this.props.navigation.state
-        this.setState({
-            RoomName: params.RoomName,
-            msgToBubble: params.msgToBubble,
-            userId: params.userId
-        })
+
+    componentDidMount() {
+        let { communityKey, roomKey } = this.props.navigation.state.params
+        this.setState({ communityKey, roomKey })
     }
 
-    updateToDatabase = () => {
-        const { RoomName, msgToBubble, userId, comment } = this.state
-        let route = 'communities/rooms/' + RoomName + '/Bubbles'
-        let sentMsg = this.state.sentMsg? userId : ''
-        console.log(firebase.database.ServerValue.TIMESTAMP)
-        firebase.database().ref(route).push({
-            RoomName,
-            msgToBubble,
-            userId,
+    handleMsg = (msg) => { this.setState({ bubble: msg }) }
+
+    pushBubble = () => {
+        const { bubble, communityKey, roomKey } = this.state
+        let uuid = this.uuid
+        let sentMsg = this.state.sentMsg ? uuid : 'created'
+        firebase.database().ref(`Bubbles/`).push({
+            bubble: bubble,
+            uuid: uuid,
             sentMsg: sentMsg,
-            timestamp: firebase.database.ServerValue.TIMESTAMP
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            loveNumber: 0 , 
+            replyNumber: 0
         }).then((res) => {
-            let result = JSON.stringify(res)
-            let addressArray = result.split('/')
-            let fullAddress = addressArray[7] // index of the folder in the firebase
-            let l = fullAddress.length
-            let address = fullAddress.substr(0, l - 1)
-            let Likes = '/Likes'
-            let Comments = '/Comments'
-            let likeAddress = route + '/' +address + Likes 
-            let commentAddress =route + '/' +address + Comments
-            
-            firebase.database().ref(likeAddress).set({
-                userId: userId,
+            firebase.database()
+            .ref(`rooms/${communityKey}/${roomKey}/Bubbles/`).push({
+                bubbleKey: res.key
             })
-            
-            firebase.database().ref(commentAddress).push({
-                userId: userId,
-                comment: comment,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            })
-
-            firebase.database().ref(commentAddress).push({
-                userId: userId,
-                comment: comment,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            })
-
-                
-
         }).catch((error) => {
-            //error callback
             console.log('error ', error)
         })
     }
@@ -74,22 +49,13 @@ export default class createBubble extends React.Component {
 
     render() {
         return (
-            <View>
-                <Button title='createBubble' onPress={this.updateToDatabase} />
+            <View style={{ paddingTop: StatusBar.currentHeight }}>
+                <TextInput
+                    placeholder='msg'
+                    onChangeText={(msg) => this.handleMsg(msg)}
+                    style={{ width: 250, borderWidth: 1, margin: 5 }} />
+                <Button title='createBubble' onPress={this.pushBubble} />
             </View>
         )
     }
 }
-
-/*
-firebase.database().ref(communites/rooms/${roomName}/Bubbles).on('value', snap => {
-    var bubbles = []
-    snap.forEach(child => {
-        bubbles.push({
-            key: child.key,
-            RoomName: child.val().RoomName,
-        })
-    })
-    this.setState({ bubbles })
-})
- */
