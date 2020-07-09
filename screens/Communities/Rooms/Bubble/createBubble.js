@@ -7,8 +7,7 @@ export default class createBubble extends React.Component {
         super()
         this.uuid = firebase.auth().currentUser.uid
         this.state = {
-            bubble: '',
-            userId: 0,
+            bubbleTxt: '',
             sentMsg: false,
             communityKey: '',
             roomKey: ''
@@ -20,14 +19,14 @@ export default class createBubble extends React.Component {
         this.setState({ communityKey, roomKey })
     }
 
-    handleMsg = (msg) => { this.setState({ bubble: msg }) }
+    handleMsg = (bubbleTxt) => { this.setState({ bubbleTxt: bubbleTxt }) }
 
     pushBubble = () => {
-        const { bubble, communityKey, roomKey } = this.state
+        let { bubbleTxt, communityKey, roomKey } = this.state
         let uuid = this.uuid
         let sentMsg = this.state.sentMsg ? uuid : 'created'
         firebase.database().ref(`Bubbles/`).push({
-            bubble: bubble,
+            bubbleTxt: bubbleTxt,
             uuid: uuid,
             sentMsg: sentMsg,
             timestamp: firebase.database.ServerValue.TIMESTAMP,
@@ -41,10 +40,6 @@ export default class createBubble extends React.Component {
         }).catch((error) => {
             console.log('error ', error)
         })
-    }
-
-    handleComments = (comment) => {
-        this.setState({ comment: comment })
     }
 
     render() {

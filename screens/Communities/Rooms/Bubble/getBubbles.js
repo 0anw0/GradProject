@@ -5,8 +5,11 @@ const getBubbleKeys = async (communityKey, roomKey, setBubbleState) => {
 
     firebase.database().ref(`rooms/${communityKey}/${roomKey}/Bubbles/`)
         .on('value', snap => {
+            if(snap.val() == null){
+                setBubbleState([])
+            }
             let bubbles = []
-            console.log('snap :-',snap)
+
             if (snap != null) {
                 snap.forEach(child => {
                     // console.log('child :-',child)
@@ -19,7 +22,7 @@ const getBubbleKeys = async (communityKey, roomKey, setBubbleState) => {
 
                                         if (user != null) {
                                             bubbles.push({
-                                                bubbleContent: element.val().bubble,
+                                                bubbleContent: element.val().bubbleTxt,
                                                 sendMsg: element.val().sentMsg,
                                                 timestamp: element.val().timestamp,
                                                 bubbleCreator: element.val().uuid,
@@ -37,8 +40,6 @@ const getBubbleKeys = async (communityKey, roomKey, setBubbleState) => {
                             setBubbleState(bubbles)
                         })
                 })
-            } else{
-                setBubbleState(bubbles)
             }
         })
 }

@@ -18,9 +18,9 @@ getUserCommunities = async (headingFromCommunity, currentUid, communityKey) => {
     return commObj
 }
 
-getHiddenByUserPosts = async () => {
+getHiddenByUserPosts = async (currentUid) => {
     let hiddenPosts = []
-    let currentUid = firebase.auth().currentUser.uid
+
     firebase.database().ref(`authenticatedUsers/${currentUid}/hiddenPosts`)
         .on('value', snap => {
             if (snap != null) {
@@ -86,11 +86,14 @@ const listenForPosts =
     async (headingFromCommunity, updatePosts, communityKey, changehasCommunitiesState,
         changehasPostsState) => {
         //Render User's joined Communities! //Render Posts from community with interactStates.
-        let posts = [], postsContainer = [], commRetrieved = false, postKey = ''
+        let posts = [], postsContainer = [], commRetrieved = false, postKey = '', currentUid
         try {
-            let currentUid = firebase.auth().currentUser.uid
+            if (firebase.auth() != null) {
+                currentUid = firebase.auth().currentUser.uid
+            }
+
             let commObj = await getUserCommunities(headingFromCommunity, currentUid, communityKey)
-            let hiddenPosts = await getHiddenByUserPosts()
+            let hiddenPosts = await getHiddenByUserPosts(currentUid)
 
             userCommunitiesKey = commObj.userCommunitiesKey
             commRetrieved = commObj.commRetrieved

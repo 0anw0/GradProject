@@ -64,6 +64,7 @@ export default class RoomsList extends React.Component {
     }
 
     render() {
+        console.log('communityKey, roomKey', this.communityKey)
         return (
             <View style={{ marginTop: StatusBar.currentHeight, flex: 1 }}>
                 <Header
