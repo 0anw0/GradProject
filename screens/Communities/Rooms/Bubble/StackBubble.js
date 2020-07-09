@@ -5,8 +5,8 @@ import createBubble from "./createBubble";
 
 
 const MainNavigator = createStackNavigator({
-  bubbleHome: { screen: BubbleHome },
-  createBubble: {screen: createBubble},
+  //bubbleHome: { screen: BubbleHome },
+  //createBubble: {screen: createBubble},
 },{
   headerMode:"none"
 });
