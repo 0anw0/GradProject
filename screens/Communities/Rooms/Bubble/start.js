@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
-import { View, FlatList, StatusBar, ActivityIndicator } from 'react-native'
+import { View, FlatList, StatusBar, ActivityIndicator, TouchableHighlight } from 'react-native'
+import { Icon } from 'react-native-elements'
 import * as firebase from 'firebase'
 
 import { firebaseConfig } from "../../../../services/firebaseConfig"
 import TouchableButton from "../../../../shared/TouchableButton";
+import { secondColor } from '../../../../shared/constants'
 import Header from '../../../../shared/Header'
 import getBubbleKeys from './getBubbles'
 import BubbleItem from './bubbleItem'
@@ -23,7 +25,7 @@ export default class BubbleHome extends Component {
             loaded: false,
             existBubbles: true,
             showReplySection: false,
-            currentUid:''
+            currentUid: ''
         }
     }
 
@@ -41,12 +43,24 @@ export default class BubbleHome extends Component {
 
     }
 
+    updateBubbles = (bubbleKey) => {
+        
+        const filteredBubbles = this.state.bubbles.filter(
+            (item) => item.bubbleKey !== bubbleKey
+        );
+        this.setState({bubbles:[]})
+        //console.log(" filteredPosts :-", filteredPosts)
+        this.setState({ bubbles: filteredBubbles });
+    };
+
+
     setBubbleState = (value) => {
         if (value.length == 0) {
             this.setState({ existBubbles: false, loaded: true })
         }
 
         this.setState({ bubbles: value, loaded: true })
+
     }
 
     naviToCreateBubble = () => {
@@ -70,12 +84,18 @@ export default class BubbleHome extends Component {
                     this.state.existBubbles ?
                         <FlatList
                             horizontal
-                            showsHorizontalScrollIndicator={false}
+                            showsHorizontalScrollIndicator={true}
                             data={this.state.bubbles}
                             renderItem={({ item }) =>
                                 <BubbleItem
                                     item={item}
+
                                     numOfItems={this.state.bubbles.length}
+                                    communityKey={this.state.communityKey}
+                                    roomKey={this.state.roomKey}
+
+                                    navigation={this.props.navigation}
+                                    updateBubbles={this.updateBubbles}
                                 />
                             } /> :
                         <TouchableButton btnStyleType={{ margin: 15 }}
@@ -89,6 +109,17 @@ export default class BubbleHome extends Component {
                     :
                     <ActivityIndicator size="large" color="blue" style={{ paddingTop: 275 }} />
                 }
+                {
+                    this.state.existBubbles ?
+                        <TouchableHighlight
+                            onPress={() => this.navigate('createBubble')}
+                        >
+                            <Icon type="font-awesome" name="plus-circle" size={50} color={secondColor} />
+                        </TouchableHighlight>
+                        : null
+                }
+
+
             </View>
         )
     }

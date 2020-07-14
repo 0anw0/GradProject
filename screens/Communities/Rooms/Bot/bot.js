@@ -1,6 +1,8 @@
+import React from "react";
 import { View, TouchableOpacity, Text } from "react-native"
 import { Avatar } from 'react-native-elements'
 
+import { styles } from './botStyles'
 
 function Bot({ name, type, botAvatar, navigate, communityKey, roomKey, botKey }) {
     return (

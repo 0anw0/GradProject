@@ -38,7 +38,6 @@ export default class createBubble extends React.Component {
             uuid: uuid,
             sentMsg: sentMsg,
             timestamp: firebase.database.ServerValue.TIMESTAMP,
-            loveNumber: 0,
             replyNumber: 0
         }).then((res) => {
             firebase.database()

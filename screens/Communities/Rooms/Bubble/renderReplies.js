@@ -1,10 +1,16 @@
 import React, { useState } from "react";
-import { View, Dimensions, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
+import { View, Dimensions, Text, TextInput, TouchableOpacity, FlatList, ScrollView } from "react-native";
 import { Icon } from 'react-native-elements';
 
+import { deleteReply } from './del-edit-reply'
 import styles from "./bubbleStyles";
 
-function Reply({ name, reply, uuid, creator }) {
+function Reply({
+    name, reply, creator, replyKey, uuid, updateReply,
+    communityKey, roomKey, bubbleKey, decreaseReplyNum }) {
+
+    //console.log('reply', communityKey, roomKey, bubbleKey, replyKey)
+
     return (
         <View style={{
             flexDirection: 'row', alignItems: 'center'
@@ -14,15 +20,22 @@ function Reply({ name, reply, uuid, creator }) {
                 <Text style={{ fontSize: 12 }}>{name}</Text>
                 <Text style={{ fontWeight: 'bold' }}>{reply}</Text>
             </View>
-            <Icon name={creator == uuid ? 'trash' : 'eye-slash'}
-                type='font-awesome' size={22} color='#555' iconStyle={styles.rightCommentIcon} />
-
+            <TouchableOpacity onPress={creator == uuid ?
+                () => {
+                    deleteReply(communityKey, roomKey, bubbleKey,
+                        replyKey, updateReply, decreaseReplyNum)
+                }
+                : () => { }}>
+                <Icon name={creator == uuid ? 'trash' : 'eye-slash'}
+                    type='font-awesome' size={22} color='#555' iconStyle={styles.rightCommentIcon} />
+            </TouchableOpacity>
         </View>
     )
 }
 
-function RenderReplies({ replies, addReply, uuid }) {
-    
+function RenderReplies({
+    replies, uuid, uploadReply, updateReply, bubbleKey, roomKey, communityKey, decreaseReplyNum }) {
+
     let [Txt, setTxt] = useState('')
     return (
         <View style={styles.replySection}>
@@ -39,23 +52,32 @@ function RenderReplies({ replies, addReply, uuid }) {
                         onChangeText={(Txt) => { setTxt(Txt) }} />
                 </View>
                 <TouchableOpacity onPress={() => {
-                    addReply(Txt)
+                    uploadReply(Txt)
                     setTxt('')
                 }}>
-                    <Icon name='paper-plane'
-                        type='font-awesome' size={22} color='#555' />
+                    <Icon name='paper-plane' type='font-awesome' size={22} color='#555' />
                 </TouchableOpacity>
             </View>
             <ScrollView>
-                {
-                    replies.map(child =>
+                <FlatList
+                    data={replies}
+                    renderItem={({ item }) =>
                         <Reply
-                            name={child.name}
-                            reply={child.reply}
+                            name={item.name}
+                            reply={item.replyTxt}
+                            creator={item.creator}
+                            replyKey={item.replyKey}
+
                             uuid={uuid}
-                            creator={child.created} />
-                    )
-                }
+
+                            updateReply={updateReply}
+                            decreaseReplyNum={decreaseReplyNum}
+                            communityKey={communityKey}
+                            bubbleKey={bubbleKey}
+                            roomKey={roomKey}
+                        />}
+                />
+
             </ScrollView>
         </View>
     )

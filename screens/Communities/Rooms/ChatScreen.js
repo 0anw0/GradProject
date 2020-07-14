@@ -2,22 +2,13 @@ import React from "react";
 import { TouchableOpacity, StyleSheet, View, Alert, StatusBar } from "react-native";
 import { GiftedChat } from "react-native-gifted-chat";
 import { Icon } from 'react-native-elements'
-import KeyboardSpacer from 'react-native-keyboard-spacer'
 import * as firebase from 'firebase'
-import Header from "../../../shared/Header"
-import { validURL, secondColor } from '../../../shared/constants'
-import { _launchCameraRoll, _takePhoto } from '../../../services/CameraAPI'
 
-// 7atet el config fel screen de manually la2n kan bygeb error fel timestamp m3 el shared firebase
-var firebaseConfig = {
-    apiKey: "AIzaSyABjDdiaYm83rEkUsEG-u5aeegZrhNDSKs",
-    authDomain: "family-social-communicat-b54bb.firebaseapp.com",
-    databaseURL: "https://family-social-communicat-b54bb.firebaseio.com",
-    projectId: "family-social-communicat-b54bb",
-    storageBucket: "family-social-communicat-b54bb.appspot.com",
-    messagingSenderId: "954697433619",
-    appId: "1:954697433619:web:24ed30743d12f703e835e6"
-};
+import { _launchCameraRoll, _takePhoto } from '../../../services/CameraAPI'
+import { validURL, secondColor } from '../../../shared/constants'
+import { firebaseConfig } from "../../../services/firebaseConfig"
+import Header from "../../../shared/Header"
+
 !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
 
 export default class ChatScreen extends React.Component {
@@ -26,9 +17,12 @@ export default class ChatScreen extends React.Component {
         this.currentUser = firebase.auth().currentUser
         this.communityKey = this.props.navigation.getParam("communityKey")
         this.roomKey = this.props.navigation.getParam("roomKey")
-        this.roomRef = firebase.database().ref(`messages/${this.communityKey}/${this.roomKey}`)
-        this.uploadedImages = firebase.database().ref(`rooms/${this.communityKey}/${this.roomKey}/uploadedImages`)
-        this.chatLinks = firebase.database().ref(`rooms/${this.communityKey}/${this.roomKey}/chatLinks`)
+        this.roomRef = firebase.database()
+            .ref(`messages/${this.communityKey}/${this.roomKey}`)
+        this.uploadedImages = firebase.database()
+            .ref(`rooms/${this.communityKey}/${this.roomKey}/uploadedImages`)
+        this.chatLinks = firebase.database()
+            .ref(`rooms/${this.communityKey}/${this.roomKey}/chatLinks`)
         this.state = {
             messages: [],
             pickedImage: null,
@@ -139,7 +133,7 @@ export default class ChatScreen extends React.Component {
                     icon='users' type='feather'
                     onPress={() => this.props.navigation.navigate("RoomMembers", {
                         roomKey: this.roomKey,
-                        communityKey: this.communityKey, 
+                        communityKey: this.communityKey,
                     })}
                     icon2='perm-media' type2='material'
                     onPress2={() => this.props.navigation.navigate("UploadedMediaStack", {
@@ -149,7 +143,6 @@ export default class ChatScreen extends React.Component {
                     }
                 />
                 {chat}
-                <KeyboardSpacer />
             </View>
         );
     }

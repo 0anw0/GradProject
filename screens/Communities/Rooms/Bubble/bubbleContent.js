@@ -4,9 +4,10 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import { Avatar, Icon } from 'react-native-elements';
 import moment from "moment";
 
+import { deleteBubble, HideBubble } from './del-Edit'
 import styles from "./bubbleStyles";
 
-function BubbleContent({ item ,currentUid}) {
+function BubbleContent({ item, currentUid, updateBubbles, communityKey, roomKey }) {
 
     let current = new Date().getTime()
     let createdAt = item.timestamp
@@ -30,7 +31,10 @@ function BubbleContent({ item ,currentUid}) {
                             </Text>}
                     </View>
                 </View>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                    item.bubbleCreator ? deleteBubble(item.bubbleKey, communityKey, roomKey, updateBubbles)
+                        : HideBubble(item.bubbleKey, currentUid)
+                }}>
                     <Icon
                         name={currentUid == item.bubbleCreator ? 'trash' : 'eye-slash'}
                         type='font-awesome' size={22} color='#555' iconStyle={styles.rightIcon} />

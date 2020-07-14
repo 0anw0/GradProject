@@ -9,7 +9,6 @@ import Play from "./screens/PlayScreen";
 import RecentChats from "./screens/RecentChats";
 import OnboardStack from "./screens/Onboard/StackOnboard";
 import TabBar from "./shared/TabBar";
-import * as firebase from 'firebase'
 
 const appStack = createStackNavigator(
   {
