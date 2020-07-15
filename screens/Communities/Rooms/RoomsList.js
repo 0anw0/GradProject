@@ -1,15 +1,15 @@
 import React from "react";
 import { FlatList, Text, View, TouchableOpacity, StatusBar } from 'react-native';
-import { Avatar } from 'react-native-elements'
+import { Avatar, Icon } from 'react-native-elements'
 
 import firebase from '../../../services/firebaseConfig'
 import Header from '../../../shared/Header'
 import styles from "./roomStyles";
 
-function SubButton({ actionFunc, ButtonTxt }) {
+function SubButton({ actionFunc, iconName }) {
     return (
         <TouchableOpacity onPress={actionFunc}>
-            <Text style={styles.option}>{ButtonTxt}</Text>
+            <Icon type="font-awesome" name={iconName} size={25} color='#a0b0ff' />
         </TouchableOpacity>
     )
 }
@@ -75,23 +75,28 @@ export default class RoomsList extends React.Component {
                 <FlatList
                     data={this.state.rooms}
                     renderItem={({ item }) =>
-                        <View style={styles.container}>
+                        <View style={[styles.container]}>
                             <Avatar rounded size={65} source={{ uri: item.avatar }} />
                             <View underlayColor="#fff" style={styles.item}>
-                                <Text style={styles.roomName}>{item.name}</Text>
-                                <View style={{ flexDirection: 'row', marginTop: 5, marginLeft: 5 }}>
+                                <View style={{paddingBottom: 5}}>
+                                    <Text style={styles.roomName}>{item.name}</Text>
+                                </View>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
                                     <SubButton actionFunc={() => this.openMessages(item)}
-                                        ButtonTxt={'chat'} />
-                                    <SubButton actionFunc={() => this.navigate('BotStack' , {
-                                        communityKey: this.communityKey, roomKey: item.key
-                                    }) }
-                                        ButtonTxt={'Chatbot'} />
-                                    <SubButton actionFunc={() => this.navigate('BubbleStack',{
+                                        iconName={'comments-o'} />
+
+                                    <SubButton actionFunc={() => this.navigate('BotStack', {
                                         communityKey: this.communityKey, roomKey: item.key
                                     })}
-                                        ButtonTxt={'Bubble'} />
+                                        iconName={'user-o'} />
+
+                                    <SubButton actionFunc={() => this.navigate('BubbleStack', {
+                                        communityKey: this.communityKey, roomKey: item.key
+                                    })}
+
+                                        iconName={'circle-thin'} />
                                     <SubButton actionFunc={() => this.updateRoom(item)}
-                                        ButtonTxt={'setting'} />
+                                        iconName={'pencil-square-o'} />
                                 </View>
                             </View>
                         </View>

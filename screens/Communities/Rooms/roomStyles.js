@@ -1,22 +1,27 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 import { secondColor } from "../../../shared/constants";
 
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        backgroundColor: '#EEE',
+        backgroundColor: '#e4e4f2',
         alignItems: 'center',
         paddingLeft: 25,
         paddingVertical: 15,
-        marginBottom: 10
+        marginBottom: 10,
+        borderRadius: 15,
+        margin: 5
     },
     item: {
-        marginLeft: 10
+        marginLeft: 10,
+        width: Dimensions.get('window').width * 0.6
     },
     roomName: {
-        fontSize: 21,
-        fontWeight: 'bold'
+        fontSize: 18,
+        letterSpacing:3 ,
+        color:secondColor,
+        fontWeight:'bold'
     },
     option: {
         fontSize: 16,
