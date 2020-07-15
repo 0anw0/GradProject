@@ -18,6 +18,7 @@ export default class App extends React.Component {
   constructor(props) {
     super(props)
     this.navigate = this.props.navigation.navigate
+    this.currentUser = firebase.auth().currentUser.uid
     this.state = {
       chats: [], //store chats messages
       Messages: [],// do nothing
@@ -29,7 +30,23 @@ export default class App extends React.Component {
     }
   }
 
-  HiddenListOpt = () => {
+
+  componentDidMount() {
+    this.getUserCommKey()
+  }
+
+  getUserCommKey = () => {
+    let list = []
+    db.ref(`authenticatedUsers/${this.currentUser}/rooms`)
+      .on('value', snap => {
+        snap.forEach(child => {
+          list.push({ roomKey: child.key })
+        })
+      })
+    this.setState({ list })
+  }
+
+  toggleHiddenList = () => {
     this.setState(prevState => ({
       ShowHiddenList: !prevState.ShowHiddenList
     }))
@@ -52,34 +69,14 @@ export default class App extends React.Component {
     })
   }
 
-  componentDidMount() {
-
-    let address = `Users/user1/joined/communities/community_1/joined/rooms/` //address of personal Logs of user
-    let list = [] //will contain the addresses of each room chat fetched from log
-    db.ref(address).on('value', snap => {
-      snap.forEach(child => {
-        list.push({
-          room_route: child.val(), //addresses of different rooms/chats
-        })
-      })
-      this.setState({ list })
-    })
-    this.getChats(list)
-  }
-
   getChats(list) {
     let hiddenCh = []
-    let chats = [] //each object will contain messages of a chat. array contains all messages
+    let chats = []
     list.forEach(element => {
-      //enters each chat/room through address
-      let hidden, id = ''
-      db.ref('/' + element.room_route + '/hidden').on('value', snap => { hidden = snap.val() })
-      db.ref('/' + element.room_route + '/id').on('value', snap => { id = snap.val() })
+      let hidden, msgKey = ''
+
       db.ref('/' + element.room_route).on('value', snap => {
-        let temp = element.room_route.split('/')//سباكه .. بجيب بيها اسم ال chat
-        let chatName = temp[2] // index of the folder in the firebase, change it depending on database
-        let timestamp = 0
-        let flag1 = false
+
         //this.latestTimestamp(child, chatName, timestamp, flag1) // where i compare messages' timestamps. and only stores one
         snap.forEach(child => {
           if (!hidden) {
@@ -214,7 +211,7 @@ export default class App extends React.Component {
           }
 
         </ScrollView>
-        <Tab active="newsfeed" navigation={this.props.navigation} />
+        <Tab active="inbox" navigation={this.props.navigation} />
 
       </View>
     )

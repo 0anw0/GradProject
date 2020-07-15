@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   },
   post: {
     padding: 10,
-    borderWidth: 1,
+    borderBottomWidth:1,
     borderColor: $grey_2,
   },
   userDetails: {
@@ -57,8 +57,8 @@ const styles = StyleSheet.create({
   postReactions: {
     padding: 14,
     flexDirection: "row",
-    borderWidth: 1,
-    //borderTopWidth: 0,
+    //borderWidth: 1,
+    borderTopWidth: 1,
     borderColor: $grey_2,
     justifyContent: "space-between",
     alignItems: 'center',

@@ -62,7 +62,7 @@ class Post extends React.Component {
       : this.item.commentsNumber;
 
     return (
-      <View style={{ borderWidth: 1, borderColor: $grey_2, borderRadius: 3, flex: 1 }}>
+      <View style={{ borderWidth: 1, borderColor: $grey_2, borderRadius: 10, flex: 1 }}>
         <PostHeader
           postMakerKey={this.item.postMakerKey}
           postKey={this.item.postKey}

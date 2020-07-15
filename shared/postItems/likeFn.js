@@ -48,19 +48,22 @@ const unlike = async (likeNumberIncrement, postKey, uuid) => {
     }
     firebase.database().ref(`posts/${postKey}/likers/`)
         .on('value', snap => {
-            snap.forEach(child => {
-                firebase.database().ref(`posts/${postKey}/likers/${child.key}`)
-                    .on('value', uidSnap => {
-                        uidSnap.forEach(uidSnapChild => {
-                            if (uidSnapChild.key == uuid) {
-                                firebase.database()
-                                    .ref(`posts/${postKey}/likers/${child.key}/${uuid}`).set(null)
+            if (snap != null) {
+                snap.forEach(child => {
+                    firebase.database().ref(`posts/${postKey}/likers/${child.key}`)
+                        .on('value', uidSnap => {
+                            if (uidSnap != null) {
+                                uidSnap.forEach(uidSnapChild => {
+                                    if (uidSnapChild.key == uuid) {
+                                        firebase.database()
+                                            .ref(`posts/${postKey}/likers/${child.key}/${uuid}`).remove()
+                                    }
+                                })
                             }
                         })
 
-                    })
-
-            })
+                })
+            }
         }) // review and recode this
 
 }

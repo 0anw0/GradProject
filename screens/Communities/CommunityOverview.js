@@ -14,11 +14,13 @@ import * as firebase from "firebase";
 import MiddleFloatingIcon from "../../shared/FloatingIcons/Middle";
 import listenForPosts from "../../shared/postItems/listenForPosts";
 import RenderPosts from "../../shared/postItems/renderPosts";
+import { secondColor } from "../../shared/constants";
 import leaveCommunityAction from "./leaveCommunity";
 import PopMenu from "../../shared/PopMenu";
 import Avatar from "../../shared/Avatar";
-import { secondColor } from "../../shared/constants";
 import styles from "./communityStyles";
+import Tab from "../../shared/TabBar";
+
 
 export default class CommunityOverview extends React.Component {
   constructor(props) {
@@ -97,7 +99,7 @@ export default class CommunityOverview extends React.Component {
   navToEditCommunity = () => {
     this.navigate('EditCommunity', {
       communityDetails: this.state.communityDetails,
-      communityKey:this.state.communityKey
+      communityKey: this.state.communityKey
     })
   }
 
@@ -187,6 +189,7 @@ export default class CommunityOverview extends React.Component {
             />
           </View>
         </ScrollView>
+        <Tab active="communities" navigation={this.props.navigation} />
       </View>
     );
   }
