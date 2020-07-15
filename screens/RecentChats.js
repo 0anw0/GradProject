@@ -2,79 +2,22 @@
 import React from 'react';
 import { Text, View, StatusBar, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import * as firebase from 'firebase'
-import moment from 'moment'
 
 import { firebaseConfig } from "../services/firebaseConfig";
-import { Avatar, Icon } from 'react-native-elements';
-import PopMenu from './RecentChats/popMenu'
-import  Header  from '../shared/Header'
+import { ChatHeader } from "./RecentChats/chatHeader"
+import Header from '../shared/Header'
 import Tab from "../shared/TabBar";
 
 console.disableYellowBox = true
 
 !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
 
-const auth = firebase.auth()
 const db = firebase.database()
-
-function Comp({ content, sender, uri, timestamp, chatName, HideChat, id, hidden, ShowChat }) { //every chat rendering 
-
-  let date1 = moment(timestamp).format('hh:MM');
-  let date2 = moment(timestamp).format('DD/MM');
-  let name = ''
-  let address = 'Users/' + sender + '/name'
-  firebase.database().ref(address).on('value', snap => {
-    name = snap.val()
-  })
-
-
-  return (
-
-    <View style={{ borderRadius: 15, margin: 10, padding: 10, backgroundColor: '#c4e9ff' }}>
-      <View style={{ flexDirection: 'row' }}>
-        <TouchableOpacity>
-          <Avatar source={{ uri: uri }} rounded size='medium' />
-        </TouchableOpacity>
-        <View style={{ width: '2%' }}>
-
-        </View>
-        <View style={{ width: '70%' }}>
-          <Text style={{ fontSize: 10 }}> {chatName} </Text>
-          <View style={{ flexDirection: 'row' }}>
-            <Text style={{ fontSize: 15, color: 'green' }}> {name}</Text>
-            <Text> : {content} </Text>
-          </View>
-        </View>
-        <View>
-          <Text style={{ fontSize: 10, flexDirection: 'column', alignItems: 'flex-end' }}> {date1} </Text>
-          <Text style={{ fontSize: 10, flexDirection: 'column', alignItems: 'flex-end' }}> {date2} </Text>
-
-          {hidden ?
-            <PopMenu item1="Reset" onPress1={() => ShowChat(id)} item2="Mute" onPress2={() => console.log(hidden)}
-              button={
-                <TouchableOpacity>
-                  <Icon name='kebab-vertical' type='octicon' size={15} />
-                </TouchableOpacity>
-              } /> :
-            <PopMenu item1="Hide" onPress1={() => HideChat(id)} item2="Mute" onPress2={() => console.log(hidden)}
-
-              button={
-                <TouchableOpacity>
-                  <Icon name='kebab-vertical' type='octicon' size={15} />
-                </TouchableOpacity>
-              } />
-          }
-        </View>
-      </View>
-    </View>
-
-  )
-}
 
 export default class App extends React.Component {
   constructor(props) {
     super(props)
-    this.navigate= this.props.navigation.navigate
+    this.navigate = this.props.navigation.navigate
     this.state = {
       chats: [], //store chats messages
       Messages: [],// do nothing
@@ -92,21 +35,11 @@ export default class App extends React.Component {
     }))
   }
 
-  async signInToDB(email, password) { //will be deleted later
-    try {
-      await auth.signInWithEmailAndPassword(email, password)
-      //this. getChatList()
-    }
-    catch (e) {
-      console.log(e)
-    }
-  }
-
-  ShowChat = (id) => {//update chat in database
+  ShowChat = (roomKey) => {//update chat in database
     if (this.state.hiddenList.length == 0) this.setState({ hiddenChats: false })
     let hiddenList = this.state.hiddenList
     hiddenList.forEach(child => {
-      if (child.id == id) {
+      if (child.roomKey == roomKey) {
         db.ref(child.address).update({
           hidden: false
         })
@@ -234,7 +167,7 @@ export default class App extends React.Component {
             <FlatList
               data={this.state.chats}
               renderItem={({ item }) => (
-                <Comp
+                <ChatHeader
                   sender={item.senderId}
                   content={item.content}
                   timestamp={item.timestamp}

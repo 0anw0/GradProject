@@ -32,34 +32,10 @@ export const deleteReply =
 
     }
 
-export const HideReply = (bubbleKey, uuid) => {
+export const hideReply = (bubbleKey, replyKey, uuid) => {
 
     firebase.database()
-        .ref(`authenticatedUsers/${uuid}/hiddenBubbles`).push({ bubbleKey: bubbleKey })
-    updateBubbles(bubbleKey)
+        .ref(`authenticatedUsers/${uuid}/hiddenBubbles/${bubbleKey}`)
+        .push({ replyKey: replyKey })
+    updateReply(replyKey)
 }
-
-/*
-if (replyKey == child.val().replyKey) {
-                    firebase.database()
-                        .ref(`${room_address}/replies/${replyKey}`)
-                        .remove().then(() => {
-
-                            firebase.database()
-                                .ref(messages_address)
-                                .on('value', snap => {
-                                    snap.forEach(child => {
-                                        if (replyKey == child.val().replyKey) {
-                                            firebase.database()
-                                                .ref(`${messages_address}/${child.key}`).remove()
-                                        }
-                                    })
-                                }
-                                )
-
-                        }).then(()=> {
-                            firebase.database()
-                            .ref(`${room_address}/replyNumber`)
-                        })
-                }
- */

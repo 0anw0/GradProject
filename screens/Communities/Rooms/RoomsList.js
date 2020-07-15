@@ -54,17 +54,17 @@ export default class RoomsList extends React.Component {
         });
     }
 
-    updateRoom(roomUP) {
-        this.props.navigation.navigate('EditRoomProfile', {
-            roomKey: roomUP.key,
-            roomAvatar: roomUP.avatar,
-            roomName: roomUP.name,
+    updateRoom(room) {
+        this.props.navigation.navigate('EditRoom', {
+            roomKey: room.key,
+            roomAvatar: room.avatar,
+            roomName: room.name,
             communityKey: this.communityKey,
         })
     }
 
     render() {
-        console.log('communityKey, roomKey', this.communityKey)
+        //console.log('communityKey, roomKey', this.communityKey)
         return (
             <View style={{ marginTop: StatusBar.currentHeight, flex: 1 }}>
                 <Header

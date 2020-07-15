@@ -8,7 +8,8 @@ const MainNavigator = createStackNavigator({
   bubbleHome: { screen: BubbleHome },
   createBubble: {screen: createBubble},
 },{
-  headerMode:"none"
+  headerMode:"none",
+  unmountInactiveRoutes: true
 });
 
 export default MainNavigator;

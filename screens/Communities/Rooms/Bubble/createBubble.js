@@ -1,17 +1,21 @@
 import React from "react";
-import { View, Button, TextInput, StatusBar } from "react-native";
+import { View, TouchableOpacity, TextInput, Text, StatusBar, Dimensions } from "react-native";
 import * as firebase from "firebase";
 
+import styles from '../../../../shared/postItems/createPostStyles'
+import Header from '../../../../shared/Header'
+
 export default class createBubble extends React.Component {
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
+        this.navigate = this.props.navigation.navigate
         this.uuid = firebase.auth().currentUser.uid || 0
         this.state = {
             bubbleTxt: '',
             sentMsg: false,
             communityKey: '',
             roomKey: '',
-            currentUid:''
+            currentUid: ''
         }
     }
 
@@ -47,16 +51,44 @@ export default class createBubble extends React.Component {
         }).catch((error) => {
             console.log('error ', error)
         })
+        this.navigate('RoomsList', {
+            communityKey: this.state.communityKey, roomKey: this.state.roomKey
+        })
     }
 
     render() {
         return (
-            <View style={{ paddingTop: StatusBar.currentHeight }}>
-                <TextInput
-                    placeholder='msg'
-                    onChangeText={(msg) => this.handleMsg(msg)}
-                    style={{ width: 250, borderWidth: 1, margin: 5 }} />
-                <Button title='createBubble' onPress={this.pushBubble} />
+            <View style={{ paddingTop: StatusBar.currentHeight, alignItems: 'center' }} >
+                <Header title="New Bubble .." />
+                <View style={{
+                    paddingHorizontal: 20, paddingVertical: 20,
+                    width: Dimensions.get('window').width
+                }}>
+
+                    <View style={styles.postContainer}>
+                        <TextInput style={styles.post}
+                            placeholder="Type something ... "
+                            placeholderTextColor='#888'
+                            autoCapitalize="none"
+                            value={this.state.bubbleTxt}
+                            multiline={true}
+                            numberOfLines={3}
+                            onChangeText={(bubbleTxt) => {
+                                this.setState({ bubbleTxt })
+                            }}
+                        />
+                    </View>
+                </View>
+                <View style={{
+                    justifyContent: 'center', alignItems: 'center', backgroundColor: '#092A75',
+                    height: 40, width: 150, borderRadius: 5
+                }}>
+                    <TouchableOpacity onPress={() => this.pushBubble()}>
+                        <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>
+                            S E N D
+                        </Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         )
     }

@@ -33,24 +33,27 @@ export default class BubbleHome extends Component {
         let { communityKey, roomKey } = this.props.navigation.state.params
         this.setState({ communityKey, roomKey })
 
-        getBubbleKeys(communityKey, roomKey, this.setBubbleState)
 
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 this.setState({ currentUid: user.uid })
             }
-        });
+        })
+
+        getBubbleKeys(communityKey, roomKey, this.state.currentUid ,this.setBubbleState)
 
     }
 
     updateBubbles = (bubbleKey) => {
-        
-        const filteredBubbles = this.state.bubbles.filter(
-            (item) => item.bubbleKey !== bubbleKey
-        );
-        this.setState({bubbles:[]})
-        //console.log(" filteredPosts :-", filteredPosts)
+        let ind = this.state.bubbles.findIndex(
+            (item) => item.bubbleKey == bubbleKey
+        )
+        //console.log(' Deleted Bubble :- ', this.state.bubbles[ind])
+        let filteredBubbles = this.state.bubbles.splice(ind, 1)
+
         this.setState({ bubbles: filteredBubbles });
+
+
     };
 
 
@@ -97,7 +100,8 @@ export default class BubbleHome extends Component {
                                     navigation={this.props.navigation}
                                     updateBubbles={this.updateBubbles}
                                 />
-                            } /> :
+                            } 
+                            /> :
                         <TouchableButton btnStyleType={{ margin: 15 }}
                             btnFunction={() => this.navigate('createBubble', {
                                 communityKey: this.state.communityKey,
@@ -112,9 +116,12 @@ export default class BubbleHome extends Component {
                 {
                     this.state.existBubbles ?
                         <TouchableHighlight
-                            onPress={() => this.navigate('createBubble')}
+                            onPress={() => this.navigate('createBubble',
+                                { communityKey: this.state.communityKey, roomKey: this.state.roomKey })}
                         >
-                            <Icon type="font-awesome" name="plus-circle" size={50} color={secondColor} />
+                            <Icon type="font-awesome"
+                                name="plus-circle" size={50} color={secondColor}
+                            />
                         </TouchableHighlight>
                         : null
                 }

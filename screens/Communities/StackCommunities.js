@@ -7,6 +7,7 @@ import CommunityMembers from './CommunityMembers'
 import CreatePost from './CreatePost'
 import EditPost from './EditPost'
 import CommunityRooms from './Rooms/StackRooms'
+import EditCommunity from "./editCommunity";
 
 const communitiesStack = createStackNavigator(
     {
@@ -17,7 +18,8 @@ const communitiesStack = createStackNavigator(
         CommunityMembers,
         CommunityRooms,
         CreatePost,
-        EditPost
+        EditPost,
+        EditCommunity
     },
     {
         headerMode: 'none',

@@ -43,7 +43,6 @@ class BubbleItem extends React.Component {
     }
 
     decreaseReplyNum = () => {
-
         this.setState(prevState => ({
             showReplyNumber: prevState.showReplyNumber - 1
         }))
@@ -90,7 +89,11 @@ class BubbleItem extends React.Component {
         this.setState(prevState =>
             ({ showReplySection: !prevState.showReplySection }))
 
-        getReplies(this.item.bubbleKey, this.setRepliesState)
+        if (this.state.showReplySection) {
+            getReplies(this.item.bubbleKey,
+                this.state.currentUid,
+                this.setRepliesState)
+        }
     }
 
     setRepliesState = (value) => {
@@ -98,10 +101,12 @@ class BubbleItem extends React.Component {
     }
 
     updateReply = (replyKey) => {
-        const filteredReplies = this.state.replies.filter(
-            (item) => item.replyKey !== replyKey
-        );
-        this.setState({ replies: [] })
+        let ind = this.state.replies.findIndex(
+            (item) => item.replyKey == replyKey
+        )
+        //console.log(' Deleted Reply :-', this.state.replies[ind])
+        let filteredReplies = this.state.replies.splice(ind, 1)
+
         this.setState({ replies: filteredReplies });
     }
 

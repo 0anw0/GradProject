@@ -1,105 +1,120 @@
-import React from 'react'
-import { View, Text, StatusBar, StyleSheet, FlatList, TouchableOpacity } from 'react-native'
-import { Avatar, Icon } from 'react-native-elements'
-import Header from '../../../shared/Header'
-import firebase from '../../../services/firebaseConfig'
+import { View, FlatList, Text, TouchableOpacity } from 'react-native';
+import { Avatar } from 'react-native-elements';
+import * as firebase from 'firebase'
+import React from 'react';
+
+import { firebaseConfig } from "../../../services/firebaseConfig";
+import styles from '../../../shared/postItems/createPostStyles'
+import { secondColor } from '../../../shared/constants'
+
+!firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
 
 export default class ChooseRoomMembers extends React.Component {
     constructor(props) {
         super(props)
-        this.navigate = this.props.navigation.navigate
-        this.commKey = this.props.navigation.getParam('commKey')
-        this.db = firebase.database()
         this.currentUser = firebase.auth().currentUser
         this.state = {
-            communityMembers: [],
-            selMembers: [],
-            selected: false,
+            members: this.props.members,
+            membersPicked: [],
+            communityKey:''
         }
+        this.setPickedMemberState = this.props.setPickedMemberState
     }
 
     componentDidMount() {
-        this.db.ref(`communities/${this.commKey}/members`).on('value', snap => {
-            var communityMembers = []
-            snap.forEach(child => {
-                this.db.ref(`authenticatedUsers/${child.key}`).on('value', snap => {
-                    if (child.key !== this.currentUser.uid) {
-                        communityMembers.push({
-                            key: snap.key,
-                            name: snap.val().fullName,
-                            avatar: snap.val().avatar,
-                        })
+        let { communityKey } = this.props.navigation.state.params
+        this.setState({ communityKey })
+        this.getCommMembers(communityKey)
+    }
+
+    getCommMembers(communityKey) {
+        let commMembers = []
+        firebase.database()
+            .ref(`communities/${communityKey}/members`)
+            .on('value', snap => {
+                snap.forEach(child => {
+                    if (!commMembers.includes(child.key)) {
+                        commMembers.push(child.key)
                     }
                 })
             })
-            this.setState({ communityMembers })
+        this.getCommMembersInfo(commMembers)
+    }
+
+    getCommMembersInfo(commMembers) {
+        var members = this.state.members
+        var uids = commMembers
+        uids.forEach(element => {
+            if (element != null) {
+                firebase.database()
+                    .ref(`authenticatedUsers/${element}`).on('value', snap => {
+                        members.push({
+                            name: snap.val().fullName,
+                            avatar: snap.val().avatar,
+                            key: element,
+                            selected: false,
+                            adminRole: false
+                        })
+                    })
+                this.setState({ members })
+            }
         })
     }
 
-    selectItem = (user) => {
+    chooseMember(member, selected, adminRole) {
+        let members = this.state.members
+        let afterSelectionMembers = []
+        for (const child in members) {
+            if (member.key == members[child].key) {
+                afterSelectionMembers.push({
+                    name: member.name,
+                    avatar: member.avatar,
+                    key: member.key,
+                    selected: selected,
+                    adminRole: adminRole
+                })
+            }
+            else {
+                afterSelectionMembers.push(members[child])
+            }
+        }
+
         this.setState({
-            //selected: !this.state.selected,
-            selMembers: [...this.state.selMembers, { key: user.key, name: user.name, avatar: user.avatar }]
+            members: afterSelectionMembers
         })
-    }
 
-    goBack = () => {
-        var members = this.state.selMembers
-        members.push({
-            avatar: this.currentUser.photoURL,
-            key: this.currentUser.uid,
-            name: this.currentUser.displayName
-        })
-        this.navigate('CreateRoom', { selMembers: this.state.selMembers })
+        this.setPickedMemberState(afterSelectionMembers)
     }
-
     render() {
-        const renderUser = (item) => (
-            <TouchableOpacity style={[styles.item, { backgroundColor: this.state.selected ? '#DDD' : '#FFF' }]} onPress={() => this.selectItem(item)}>
-                <Avatar rounded size="medium" source={{ uri: item.avatar }} />
-                <View>
-                    <Text style={styles.memberName}>{item.name}</Text>
-                </View>
-            </TouchableOpacity>
-        )
         return (
-            <View style={{ marginTop: StatusBar.currentHeight }}>
-                <Header
-                    title="Choose Members .."
-                    icon='done' type='material'
-                    onPress={this.goBack}
-                />
+            <View>
                 <FlatList
-                    style={{ padding: 6 }}
-                    data={this.state.communityMembers}
-                    extraData={this.state.selected}
+                    style={{ borderColor: secondColor, borderWidth: 2, height: 225 }}
+                    data={this.state.members}
                     keyExtractor={(item) => item.key}
-                    renderItem={({ item }) => renderUser(item)}
+                    renderItem={({ item }) =>
+                        <View style={[styles.memberList,
+                        { borderWidth: item.selected ? 2 : null, margin: 10 }]}>
+                            <TouchableOpacity onPress={() => {
+                                if (item.selected && !item.adminRole)
+                                    this.chooseMember(item, false, false)
+                                else this.chooseMember(item, true, false)
+                            }}>
+                                <Avatar rounded size={25} source={{ uri: item.avatar }} />
+                                <Text style={styles.communityName}>{item.name}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => {
+                                !item.adminRole ? this.chooseMember(item, true, true)
+                                    : this.chooseMember(item, true, false)
+                            }}>
+                                {item.adminRole ?
+                                    <Text> remove admin </Text> : <Text> make admin </Text>
+                                }
+                            </TouchableOpacity>
+                        </View>
+                    }
                 />
             </View>
-        )
+        );
     }
 }
-
-const styles = StyleSheet.create({
-    item: {
-        borderColor: '#AAA',
-        borderWidth: 1,
-        padding: 10,
-        marginBottom: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    memberName: {
-        fontSize: 20,
-        marginLeft: 15,
-        letterSpacing: 1
-    },
-    memberStatus: {
-        fontSize: 17,
-        marginLeft: 15,
-        marginTop: 3,
-        color: '#333'
-    }
-})
-

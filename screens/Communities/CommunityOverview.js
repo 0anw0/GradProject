@@ -90,9 +90,16 @@ export default class CommunityOverview extends React.Component {
     const filteredPosts = this.state.posts.filter(
       (item) => item.postKey !== postKey
     );
-    console.log(" filteredPosts :-", filteredPosts);
+    //console.log(" filteredPosts :-", filteredPosts);
     this.setState({ posts: filteredPosts });
   };
+
+  navToEditCommunity = () => {
+    this.navigate('EditCommunity', {
+      communityDetails: this.state.communityDetails,
+      communityKey:this.state.communityKey
+    })
+  }
 
   render() {
     return (
@@ -154,7 +161,8 @@ export default class CommunityOverview extends React.Component {
                 </Text>
               </View>
 
-              <TouchableOpacity style={styles.editCommunity}>
+              <TouchableOpacity onPress={() => this.navToEditCommunity()}
+                style={styles.editCommunity}>
                 <Icon
                   name="edit"
                   type="feather"
@@ -166,7 +174,7 @@ export default class CommunityOverview extends React.Component {
           </View>
 
           {/* <Divider style={{ backgroundColor: '#AAA', marginBottom: 20 }} /> */}
-          <View style={{padding: 13}}>
+          <View style={{ padding: 13 }}>
             <RenderPosts
               loaded={this.state.loaded}
               hasCommunities={true}

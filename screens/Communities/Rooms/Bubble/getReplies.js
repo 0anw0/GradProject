@@ -1,7 +1,18 @@
 import React from 'react'
 import * as firebase from 'firebase'
 
-const getReplies = async (bubbleKey, setRepliesState) => {
+const getReplies = async (bubbleKey,uuid,  setRepliesState) => {
+
+    let hiddenReplies = []
+    firebase.database()
+        .ref(`authenticatedUsers/${uuid}/hiddenReplies/${bubbleKey}/`)
+        .on('value', snap => {
+            if (snap != null) {
+                snap.forEach(child => {
+                    hiddenReplies.push(child.val().replyKey)
+                })
+            }
+        })
 
     firebase.database().ref(`Bubbles/${bubbleKey}/replies/`)
         .on('value', snap => {
@@ -18,14 +29,16 @@ const getReplies = async (bubbleKey, setRepliesState) => {
                         firebase.database().ref(`authenticatedUsers/${child.val().creator}`)
                             .once('value', user => {
                                 if (user != null) {
-                                    replies.push({
-                                        replyKey: child.key,
-                                        replyTxt: child.val().replyTxt,
-                                        timestamp: child.val().timestamp || 0,
-                                        creator: child.val().creator,
-                                        avatar: user.val().avatar,
-                                        name: user.val().fullName,
-                                    })
+                                    if (!hiddenReplies.includes(child.key)) {
+                                        replies.push({
+                                            replyKey: child.key,
+                                            replyTxt: child.val().replyTxt,
+                                            timestamp: child.val().timestamp || 0,
+                                            creator: child.val().creator,
+                                            avatar: user.val().avatar,
+                                            name: user.val().fullName,
+                                        })
+                                    }
                                 }
                             })
                     }

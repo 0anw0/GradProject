@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Dimensions, Text, TextInput, TouchableOpacity, FlatList, ScrollView } from "react-native";
 import { Icon } from 'react-native-elements';
 
-import { deleteReply } from './del-edit-reply'
+import { deleteReply } from './del-hide-reply'
 import styles from "./bubbleStyles";
 
 function Reply({
@@ -25,7 +25,7 @@ function Reply({
                     deleteReply(communityKey, roomKey, bubbleKey,
                         replyKey, updateReply, decreaseReplyNum)
                 }
-                : () => { }}>
+                : () => { hideReply(bubbleKey, replyKey, uuid) }}>
                 <Icon name={creator == uuid ? 'trash' : 'eye-slash'}
                     type='font-awesome' size={22} color='#555' iconStyle={styles.rightCommentIcon} />
             </TouchableOpacity>
