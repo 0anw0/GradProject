@@ -23,7 +23,7 @@ getHiddenByUserPosts = async (currentUid) => {
 
     firebase.database().ref(`authenticatedUsers/${currentUid}/hiddenPosts`)
         .on('value', snap => {
-            if (snap != null) {
+            if (snap) {
                 snap.forEach(child => {
                     hiddenPosts.push(child.val().postKey)
                 })
@@ -38,15 +38,21 @@ getUserPosts = async (postsContainer) => {
         let communities, images
         firebase.database().ref(`posts/${postsContainer[child]}`).on('value',
             post => {
-                if (post.val() != null) {
+                if (post.val()) {
                     images = post.val().images || null
                     communities = post.val().communities
 
                     let commNames = [], postImages = []
                     for (const child in communities) {
                         //console.log('communities:-', communities[child])
+                        let name =''    
+                        firebase.database()
+                        .ref(`communities/${communities[child].key}/name`)
+                        .on('value' ,commNameSnap => {
+                            name = commNameSnap.val()
+                        })
                         commNames.push({
-                            name: communities[child].name,
+                            name:name,
                             key: communities[child].key
                         })
                     }
@@ -57,7 +63,7 @@ getUserPosts = async (postsContainer) => {
 
                     let uuid = post.val().user || ''
 
-                    if (uuid != null) {
+                    if (uuid) {
                         firebase.database()
                             .ref(`authenticatedUsers/${uuid}/`).on('value', user => {
                                 //console.log('user ', user.val())
@@ -88,7 +94,7 @@ const listenForPosts =
         //Render User's joined Communities! //Render Posts from community with interactStates.
         let posts = [], postsContainer = [], commRetrieved = false, postKey = '', currentUid
         try {
-            if (firebase.auth() != null) {
+            if (firebase.auth()) {
                 currentUid = firebase.auth().currentUser.uid
             }
 

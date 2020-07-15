@@ -22,7 +22,7 @@ class Post extends React.Component {
   }
 
   componentDidMount() {
-    this.loadLikes();
+    this.loadLikes()
   }
 
   loadLikes = () => {
@@ -30,12 +30,14 @@ class Post extends React.Component {
       .database()
       .ref(`posts/${this.item.postKey}/likers/`)
       .on("value", (snap) => {
-        snap.forEach((child) => {
-          if (child.key == this.currentUser) {
-            this.setState({ liked: true });
-          }
-        });
-      });
+        if (snap) {
+          snap.forEach((child) => {
+            if (child.val().key == this.currentUser) {
+              this.setState({ liked: true });
+            }
+          })
+        }
+      })
   };
 
   updateLikesNumber = (value) => {

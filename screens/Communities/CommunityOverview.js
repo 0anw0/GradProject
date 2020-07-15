@@ -105,7 +105,7 @@ export default class CommunityOverview extends React.Component {
 
   render() {
     return (
-      <View style={{ marginTop: StatusBar.currentHeight, flex: 1 }}>
+      <View style={{ flex:1, marginTop: StatusBar.currentHeight, flex: 1 }}>
         <MiddleFloatingIcon
           icon="md-list"
           type="ionicon"
@@ -189,7 +189,6 @@ export default class CommunityOverview extends React.Component {
             />
           </View>
         </ScrollView>
-        <Tab active="communities" navigation={this.props.navigation} />
       </View>
     );
   }

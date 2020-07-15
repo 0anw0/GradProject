@@ -1,5 +1,8 @@
 import * as firebase from "firebase";
 
+import { firebaseConfig } from "../../services/firebaseConfig";
+!firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
+
 export const like = async (postKey, toggleLike, updateLikesNumber) => {
     let uuid = firebase.auth().currentUser.uid
     let likeNumberIncrement, liked
@@ -12,25 +15,26 @@ export const like = async (postKey, toggleLike, updateLikesNumber) => {
     firebase.database().ref(`posts/${postKey}/likers/`)
         .on('value', snap => {
             liked = false
-            snap.forEach(child => {
-                if (child.key == uuid) {
-                    liked = true
-                } else {
-                    liked = false
-                }
-            })
+            if (snap) {
+                snap.forEach(child => {
+                    //console.log('this is ', child.val().uuid)
+                    if (child.val().uuid == uuid) {
+                        liked = true
+                    } else {
+                        liked = false
+                    }
+                })
+            }
         })
 
     if (likeNumberIncrement == 0) {
-        liked = true;
+        liked = false;
     }
 
-    console.log('liked :-', liked)
-
-    if (liked) {
+    if (!liked) {
         likeNumberIncrement++
         firebase.database().ref(`posts/${postKey}/likesNumber`).set(likeNumberIncrement)
-        firebase.database().ref(`posts/${postKey}/likers`).push({ [uuid]: uuid })
+        firebase.database().ref(`posts/${postKey}/likers`).push({ uuid: uuid })
     }
     else {
         await unlike(likeNumberIncrement, postKey, uuid)
@@ -46,24 +50,14 @@ const unlike = async (likeNumberIncrement, postKey, uuid) => {
         likeNumberIncrement--
         firebase.database().ref(`posts/${postKey}/likesNumber`).set(likeNumberIncrement)
     }
-    firebase.database().ref(`posts/${postKey}/likers/`)
+    firebase.database()
+        .ref(`posts/${postKey}/likers/`)
         .on('value', snap => {
-            if (snap != null) {
-                snap.forEach(child => {
-                    firebase.database().ref(`posts/${postKey}/likers/${child.key}`)
-                        .on('value', uidSnap => {
-                            if (uidSnap != null) {
-                                uidSnap.forEach(uidSnapChild => {
-                                    if (uidSnapChild.key == uuid) {
-                                        firebase.database()
-                                            .ref(`posts/${postKey}/likers/${child.key}/${uuid}`).remove()
-                                    }
-                                })
-                            }
-                        })
-
-                })
-            }
-        }) // review and recode this
-
+            snap.forEach(child => {
+                if (child.val().uuid == uuid) {
+                    firebase.database()
+                        .ref(`posts/${postKey}/likers/${child.key}`).remove()
+                }
+            })
+        })
 }
