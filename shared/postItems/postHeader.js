@@ -3,8 +3,8 @@ import { View, Text, TouchableOpacity, Alert } from "react-native";
 
 import { deletePost, hidePost, reportPost } from "./deleteEditReport";
 import { Avatar } from "react-native-elements";
-import Pop from "../PopMenu";
 import styles from "./postStyles";
+import Pop from "../PopMenu";
 
 export function PostHeader({
   postMakerKey,

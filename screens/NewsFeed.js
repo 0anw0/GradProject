@@ -38,6 +38,10 @@ export default class NewsFeed extends React.Component {
     //checkForAnnouncement(this.changeAnnouncementState())
   }
 
+  componentWillUnmount(){
+    listenForPosts()
+  }
+
   refreshScrollView() {
     this.setState({ refreshing: true });
     listenForPosts(

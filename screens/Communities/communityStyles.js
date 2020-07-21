@@ -56,14 +56,20 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   communityNameTxtInput: {
-    fontSize: 20,
-    textAlign: "center",
-    borderBottomWidth: 1,
+    marginTop: 5,
+    paddingLeft: 3,
+    fontSize: 16,
+    borderWidth: 1,
+    borderRadius: 5,
+    borderColor: secondColor
   },
   communityDisTxtInput: {
-    fontSize: 16,
-    textAlign: "center",
-    borderBottomWidth: 1,
+    marginTop:5,
+    paddingLeft: 3,
+    fontSize: 12,
+    borderWidth: 1,
+    borderRadius: 5,
+    borderColor: secondColor
   },
   addMembers: {
     marginLeft: 5,

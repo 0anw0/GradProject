@@ -19,14 +19,12 @@ import leaveCommunityAction from "./leaveCommunity";
 import PopMenu from "../../shared/PopMenu";
 import Avatar from "../../shared/Avatar";
 import styles from "./communityStyles";
-import Tab from "../../shared/TabBar";
-
 
 export default class CommunityOverview extends React.Component {
   constructor(props) {
     super(props);
-    this.navigate = this.props.navigation.navigate;
-    this.communityKey = this.props.navigation.getParam("communityKey");
+    this.navigate = this.props.navigation.navigate
+    this.communityKey = this.props.navigation.state.params.communityKey
     this.state = {
       communityDetails: {},
       posts: [],
@@ -110,7 +108,7 @@ export default class CommunityOverview extends React.Component {
           icon="md-list"
           type="ionicon"
           onPress={() =>
-            this.navigate("CommunityRooms", { communityKey: this.communityKey })
+            this.navigate("RoomsList", { communityKey: this.communityKey })
           }
         />
 

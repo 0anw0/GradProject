@@ -19,7 +19,6 @@ const styles = StyleSheet.create({
     },
     roomName: {
         fontSize: 18,
-        letterSpacing:3 ,
         color:secondColor,
         fontWeight:'bold'
     },

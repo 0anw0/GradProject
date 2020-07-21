@@ -1,10 +1,9 @@
-import { View, FlatList, Text, TouchableOpacity } from 'react-native';
-import { Avatar } from 'react-native-elements';
+import { View, FlatList, Text, TouchableOpacity ,ScrollView , Dimensions} from 'react-native';
+import { Avatar, ListItem } from 'react-native-elements';
 import * as firebase from 'firebase'
 import React from 'react';
 
 import { firebaseConfig } from "../../services/firebaseConfig";
-import styles from '../../shared/postItems/createPostStyles'
 import { secondColor } from '../../shared/constants'
 
 !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
@@ -64,7 +63,7 @@ export default class ChooseCommunityMembers extends React.Component {
             if (friend.key == friends[child].key) {
                 afterSelectionFriends.push({
                     name: friend.name,
-                    image: friend.image,
+                    avatar: friend.avatar,
                     key: friend.key,
                     selected: selected,
                     adminRole: adminRole
@@ -84,33 +83,71 @@ export default class ChooseCommunityMembers extends React.Component {
     render() {
         return (
             <View>
+            <ScrollView style={{ borderRadius: 5 }}>
                 <FlatList
-                    style={{ borderColor: secondColor, borderWidth: 2, height: 225 }}
+                    style={{
+                        borderColor: secondColor,
+                        borderWidth: 1, borderRadius: 10, height: 225, 
+                        height: Dimensions.get('window').height * 0.55
+                    }}
                     data={this.state.friends}
                     keyExtractor={(item) => item.key}
                     renderItem={({ item }) =>
-                        <View style={[styles.memberList,
-                        { borderWidth: item.selected ? 2 : null, margin: 10 }]}>
+                        <View style={{margin: 5}}>
                             <TouchableOpacity onPress={() => {
                                 if (item.selected && !item.adminRole)
                                     this.chooseFriend(item, false, false)
                                 else this.chooseFriend(item, true, false)
                             }}>
-                                <Avatar rounded size={25} source={{ uri: item.avatar }} />
-                                <Text style={styles.communityName}>{item.name}</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => {
-                                !item.adminRole ? this.chooseFriend(item, true, true)
-                                    : this.chooseFriend(item, true, false)
-                            }}>
-                                {item.adminRole ?
-                                    <Text> remove admin </Text> : <Text> make admin </Text>
-                                }
+                                <ListItem
+                                    key={item.key}
+                                    leftAvatar={{ source: { uri: item.avatar } }}
+                                    title={item.name}
+                                    titleStyle={item.selected ?
+                                        { color: secondColor, fontWeight: 'bold' } :
+                                        null}
+
+                                    containerStyle={
+                                        {
+                                            backgroundColor: item.selected ? '#ebe3ff' : null,
+                                            borderRadius: 3
+                                        }
+                                    }
+
+                                    bottomDivider
+                                    rightElement={
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                !item.adminRole ?
+                                                    this.chooseFriend(item, true, true)
+                                                    : this.chooseFriend(item, true, false)
+                                            }}>
+                                            <View
+                                                style={{
+                                                    borderRadius: 5,
+                                                    borderWidth: item.adminRole ? 1 : null,
+                                                    borderColor: secondColor
+                                                }}>
+                                                <Text
+                                                    style={{
+                                                        color: item.adminRole
+                                                            ? secondColor : null,
+                                                        padding: 10,
+                                                        letterSpacing: 2,
+                                                        fontWeight: item.adminRole
+                                                            ? 'bold' : null,
+                                                    }}
+                                                >admin </Text>
+                                            </View>
+                                        </TouchableOpacity>
+                                    }
+                                />
                             </TouchableOpacity>
                         </View>
                     }
                 />
-            </View>
+            </ScrollView>
+        </View>
         );
     }
 }

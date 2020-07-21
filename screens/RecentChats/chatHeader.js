@@ -1,68 +1,82 @@
 import React from 'react'
 import * as firebase from 'firebase'
 import { View, TouchableOpacity, Text } from "react-native";
-import { Avatar } from 'react-native-elements'
+import { Avatar, ListItem, Icon } from 'react-native-elements'
+
+import styles from "./recentChatStyles"
 import moment from 'moment'
 
-import PopMenu from '../../shared/PopMenu'
-import styles from "./recentChatStyles"
-
-export const ChatHeader = function ({
-    content, sender, uri, timestamp, roomName, HideChat, id, hidden, ShowChat
+export const ChatHeader = function ({ item, manageChat ,navigate
 }) {
-    let current = new Date().getTime()
-    let createdAt = timestamp
-    let name = ''
-    firebase.database()
-        .ref(`authenticatedUsers/${sender}/fullName`)
-        .on('value', snap => {
-            name = snap.val()
-        })
+    let current = new Date().getTime(), createdAt = item.timestamp, roomName, avatar, hidden = false
+
+    firebase.database().ref(`rooms/${item.roomKey}/`
+    ).on('value', snap => {
+        roomName = snap.val().name,
+            avatar = snap.val().avatar
+    })
 
     return (
-        <View style={styles.roomChat}>
-            <View style={{ flexDirection: 'row' }}>
-                <TouchableOpacity>
-                    <Avatar source={{ uri: uri }} rounded size='medium' />
-                </TouchableOpacity>
-                <View style={{ width: '2%' }}>
+        <View style={{ marginTop: 5, marginHorizontal:5 }}>
+            <ListItem
+                onPress={navigate('ChatScreen', {
+                    roomKey: item.roomKey
+                })}
+                containerStyle={{
+                    borderRadius: 10,
+                    backgroundColor: item.hidden ? '#ffffff50' : '#ffffff'
+                }}
+                key={item.msgKey}
+                leftElement={
+                    <View style={{ flexDirection: "row" }}>
+                        <Avatar
+                            size={50}
+                            rounded
+                            source={{ uri: avatar }}
+                        />
+                        <View style={{ flexDirection: 'column', paddingLeft: 8 }}>
+                            <Text style={{
+                                color: '#2a46b5', fontWeight: '700'
+                            }}
+                            >{roomName}</Text>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={{ color: '#8090ff', fontSize: 13 }}>{item.user.name}:</Text>
+                                <Text style={{ color: '#0f1b6b' }}>  {item.text}</Text>
+                            </View>
+                            <View>
+                                {current - createdAt <= 86400000 ?
+                                    <Text style={[styles.timestamp, { color: '#b5b4d4' }]}>{
+                                        moment(createdAt).startOf('minute').fromNow()}
+                                    </Text>
+                                    : <Text style={styles.timeStyle}>
+                                        {moment(createdAt).calendar()}
+                                    </Text>
+                                }
+                            </View>
+                        </View>
 
-                </View>
-                <View style={{ width: '70%' }}>
-                    <Text style={{ fontSize: 10 }}> {roomName} </Text>
-                    <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ fontSize: 15, color: 'green' }}> {name}</Text>
-                        <Text> : {content} </Text>
                     </View>
-                </View>
-                <View>
-                    {current - createdAt <= 86400000 ?
-                        <Text style={styles.timestamp}>{
-                            moment(createdAt).startOf('minute').fromNow()}
-                        </Text>
-                        : <Text style={styles.timeStyle}>
-                            {moment(createdAt).calendar()}
-                        </Text>}
-
-                    {hidden ?
-                        <PopMenu item1="Reset"
-                            onPress1={() => ShowChat(id)}
-                            button={
-                                <TouchableOpacity>
-                                    <Icon name='kebab-vertical' type='octicon' size={15} />
-                                </TouchableOpacity>
-                            } /> :
-                        <PopMenu item1="Hide" onPress1={() => HideChat(id)}
-
-                            button={
-                                <TouchableOpacity>
-                                    <Icon name='kebab-vertical' type='octicon' size={15} />
-                                </TouchableOpacity>
-                            } />
-                    }
-                </View>
-            </View>
+                }
+                bottomDivider
+                rightElement={
+                    item.hidden ?
+                        <TouchableOpacity onPress={() => manageChat(item.roomKey, true)}>
+                            <Icon
+                                name='eye'
+                                type='font-awesome'
+                                color='#2a46b550'
+                                size={20}
+                            />
+                        </TouchableOpacity>
+                        : <TouchableOpacity onPress={() => manageChat(item.roomKey, false)}>
+                            <Icon
+                                name='eye-slash'
+                                type='font-awesome'
+                                color='#a6a6a650'
+                                size={20}
+                            />
+                        </TouchableOpacity>
+                } />
         </View>
-
     )
 }

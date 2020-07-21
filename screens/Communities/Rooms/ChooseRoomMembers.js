@@ -1,10 +1,9 @@
-import { View, FlatList, Text, TouchableOpacity } from 'react-native';
-import { Avatar } from 'react-native-elements';
+import { View, FlatList, Text, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { ListItem } from 'react-native-elements';
 import * as firebase from 'firebase'
 import React from 'react';
 
 import { firebaseConfig } from "../../../services/firebaseConfig";
-import styles from '../../../shared/postItems/createPostStyles'
 import { secondColor } from '../../../shared/constants'
 
 !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
@@ -13,18 +12,17 @@ export default class ChooseRoomMembers extends React.Component {
     constructor(props) {
         super(props)
         this.currentUser = firebase.auth().currentUser
+        this.communityKey = this.props.communityKey
         this.state = {
             members: this.props.members,
             membersPicked: [],
-            communityKey:''
+            adminNum: 0
         }
         this.setPickedMemberState = this.props.setPickedMemberState
     }
 
     componentDidMount() {
-        let { communityKey } = this.props.navigation.state.params
-        this.setState({ communityKey })
-        this.getCommMembers(communityKey)
+        this.getCommMembers(this.communityKey)
     }
 
     getCommMembers(communityKey) {
@@ -38,6 +36,7 @@ export default class ChooseRoomMembers extends React.Component {
                     }
                 })
             })
+
         this.getCommMembersInfo(commMembers)
     }
 
@@ -71,7 +70,7 @@ export default class ChooseRoomMembers extends React.Component {
                     avatar: member.avatar,
                     key: member.key,
                     selected: selected,
-                    adminRole: adminRole
+                    adminRole: adminRole,
                 })
             }
             else {
@@ -83,38 +82,80 @@ export default class ChooseRoomMembers extends React.Component {
             members: afterSelectionMembers
         })
 
+        if (adminRole && this.state.adminNum != 0)
+            this.setState(prevState => ({ adminNum: prevState.adminNum + 1 }))
+        else this.setState(prevState => ({ adminNum: prevState.adminNum - 1 }))
+
         this.setPickedMemberState(afterSelectionMembers)
     }
     render() {
         return (
             <View>
-                <FlatList
-                    style={{ borderColor: secondColor, borderWidth: 2, height: 225 }}
-                    data={this.state.members}
-                    keyExtractor={(item) => item.key}
-                    renderItem={({ item }) =>
-                        <View style={[styles.memberList,
-                        { borderWidth: item.selected ? 2 : null, margin: 10 }]}>
-                            <TouchableOpacity onPress={() => {
-                                if (item.selected && !item.adminRole)
-                                    this.chooseMember(item, false, false)
-                                else this.chooseMember(item, true, false)
-                            }}>
-                                <Avatar rounded size={25} source={{ uri: item.avatar }} />
-                                <Text style={styles.communityName}>{item.name}</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => {
-                                !item.adminRole ? this.chooseMember(item, true, true)
-                                    : this.chooseMember(item, true, false)
-                            }}>
-                                {item.adminRole ?
-                                    <Text> remove admin </Text> : <Text> make admin </Text>
-                                }
-                            </TouchableOpacity>
-                        </View>
-                    }
-                />
+                <ScrollView style={{ borderRadius: 5 }}>
+                    <FlatList
+                        style={{
+                            borderColor: secondColor,
+                            borderWidth: 1, borderRadius: 10, height: 225,
+                            height: Dimensions.get('window').height * 0.55
+                        }}
+                        data={this.state.members}
+                        keyExtractor={(item) => item.key}
+                        renderItem={({ item }) =>
+                            <View style={{ margin: 5 }}>
+                                <TouchableOpacity onPress={() => {
+                                    if (item.selected && !item.adminRole)
+                                        this.chooseMember(item, false, false)
+                                    else this.chooseMember(item, true, false)
+                                }}>
+                                    <ListItem
+                                        key={item.key}
+                                        leftAvatar={{ source: { uri: item.avatar } }}
+                                        title={item.name}
+                                        titleStyle={item.selected ?
+                                            { color: secondColor, fontWeight: 'bold' } :
+                                            null}
+
+                                        containerStyle={
+                                            {
+                                                backgroundColor: item.selected ? '#ebe3ff' : null,
+                                                borderRadius: 3
+                                            }
+                                        }
+
+                                        bottomDivider
+                                        rightElement={
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    !item.adminRole ?
+                                                        this.chooseMember(item, true, true)
+                                                        : this.chooseMember(item, true, false)
+                                                }}>
+                                                <View
+                                                    style={{
+                                                        borderRadius: 5,
+                                                        borderWidth: item.adminRole ? 1 : null,
+                                                        borderColor: secondColor
+                                                    }}>
+                                                    <Text
+                                                        style={{
+                                                            color: item.adminRole
+                                                                ? secondColor : null,
+                                                            padding: 10,
+                                                            letterSpacing: 2,
+                                                            fontWeight: item.adminRole
+                                                                ? 'bold' : null,
+                                                        }}
+                                                    >admin </Text>
+                                                </View>
+                                            </TouchableOpacity>
+                                        }
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        }
+                    />
+                </ScrollView>
             </View>
-        );
+        )
     }
 }

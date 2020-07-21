@@ -1,7 +1,8 @@
 import React from "react";
-import { FlatList, Text, View, TouchableOpacity, StatusBar } from 'react-native';
+import { FlatList, Text, View, TouchableOpacity, StatusBar, ActivityIndicator } from 'react-native';
 import { Avatar, Icon } from 'react-native-elements'
 
+import TouchableButton from '../../../shared/TouchableButton'
 import firebase from '../../../services/firebaseConfig'
 import Header from '../../../shared/Header'
 import styles from "./roomStyles";
@@ -17,32 +18,43 @@ function SubButton({ actionFunc, iconName }) {
 export default class RoomsList extends React.Component {
     constructor(props) {
         super(props);
-        var firebaseDB = firebase.database();
         this.navigate = this.props.navigation.navigate
-        this.communityKey = this.props.navigation.getParam('communityKey')
-        this.roomsRef = firebaseDB.ref('rooms/' + this.communityKey).orderByChild('name');
+        this.uuid = firebase.auth().currentUser.uid
+        this.communityKey = this.props.navigation.state.params.communityKey
         this.state = {
             rooms: [],
-            newRoom: ''
+            newRoom: '',
+            existRooms: true,
+            loaded: false,
         }
     }
 
     componentDidMount() {
-        this.listenForRooms(this.roomsRef);
+        this.listenForRooms()
     }
 
-    listenForRooms(roomsRef) {
-        roomsRef.on('value', (dataSnapshot) => {
-            var roomsFB = [];
-            dataSnapshot.forEach((child) => {
-                roomsFB.push({
-                    name: child.val().name,
-                    avatar: child.val().avatar,
-                    key: child.key
-                });
-            });
-            this.setState({ rooms: roomsFB });
-        });
+    listenForRooms() {
+        var roomsFB = []
+        firebase.database()
+            .ref(`authenticatedUsers/${this.uuid}/communities/${this.communityKey}/rooms`)
+            .on('value', snap => {
+                snap.forEach(child => {
+                    firebase.database().ref(`rooms/${child.key}`)
+                        .on('value', element => {
+                            roomsFB.push({
+                                name: element.val().name,
+                                avatar: element.val().avatar,
+                                key: child.key
+                            });
+                        });
+                })
+            })
+
+        this.setState({
+            rooms: roomsFB,
+            existRooms: roomsFB.length == 0 ? false : true,
+            loaded: true
+        })
     }
 
     openMessages(room) {
@@ -64,44 +76,59 @@ export default class RoomsList extends React.Component {
     }
 
     render() {
-        //console.log('communityKey, roomKey', this.communityKey)
         return (
             <View style={{ marginTop: StatusBar.currentHeight, flex: 1 }}>
                 <Header
                     title="Rooms"
                     icon='plus' type='font-awesome'
-                    onPress={() => this.navigate('CreateRoom', { communityKey: this.communityKey })}
+                    onPress={() => this.navigate('CreateRoom',
+                        { communityKey: this.communityKey })}
                 />
-                <FlatList
-                    data={this.state.rooms}
-                    renderItem={({ item }) =>
-                        <View style={[styles.container]}>
-                            <Avatar rounded size={65} source={{ uri: item.avatar }} />
-                            <View underlayColor="#fff" style={styles.item}>
-                                <View style={{paddingBottom: 5}}>
-                                    <Text style={styles.roomName}>{item.name}</Text>
+                {this.state.loaded ?
+                    !this.state.existRooms ?
+                        <TouchableButton btnStyleType={styles.icon}
+                            btnFunction={() => this.navigate('CreateRoom',
+                                { communityKey: this.communityKey })}
+                            txt={true} icon={true} name='plus' type='font-awesome' size={30}
+                            color={'blue'} txtValue={'Create Your First Room!'}
+                            txtStyleType={{ margin: 10 }} />
+                        :
+                        <FlatList
+                            data={this.state.rooms}
+                            renderItem={({ item }) =>
+                                <View style={[styles.container]}>
+                                    <Avatar rounded size={65} source={{ uri: item.avatar }} />
+                                    <View underlayColor="#fff" style={styles.item}>
+                                        <View style={{ paddingBottom: 5 }}>
+                                            <Text style={styles.roomName}>{item.name}</Text>
+                                        </View>
+                                        <View style={{
+                                            flexDirection: 'row',
+                                            justifyContent: 'space-around'
+                                        }}>
+                                            <SubButton actionFunc={() => this.openMessages(item)}
+                                                iconName={'comments-o'} />
+
+                                            <SubButton actionFunc={() => this.navigate('BotStack', {
+                                                communityKey: this.communityKey,
+                                                roomKey: item.key
+                                            })}
+                                                iconName={'user-o'} />
+
+                                            <SubButton actionFunc={() => this.navigate('BubbleStack', {
+                                                communityKey: this.communityKey,
+                                                roomKey: item.key
+                                            })}
+
+                                                iconName={'circle-thin'} />
+                                            <SubButton actionFunc={() => this.updateRoom(item)}
+                                                iconName={'pencil-square-o'} />
+                                        </View>
+                                    </View>
                                 </View>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                                    <SubButton actionFunc={() => this.openMessages(item)}
-                                        iconName={'comments-o'} />
-
-                                    <SubButton actionFunc={() => this.navigate('BotStack', {
-                                        communityKey: this.communityKey, roomKey: item.key
-                                    })}
-                                        iconName={'user-o'} />
-
-                                    <SubButton actionFunc={() => this.navigate('BubbleStack', {
-                                        communityKey: this.communityKey, roomKey: item.key
-                                    })}
-
-                                        iconName={'circle-thin'} />
-                                    <SubButton actionFunc={() => this.updateRoom(item)}
-                                        iconName={'pencil-square-o'} />
-                                </View>
-                            </View>
-                        </View>
-                    }
-                />
+                            }
+                        />
+                    : <ActivityIndicator size="large" color="blue" style={{ paddingTop: 275 }} />}
             </View>
         );
     }

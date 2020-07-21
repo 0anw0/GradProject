@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Button, StatusBar, ActivityIndicator } from 'react-native';
-
+import { View, StatusBar, ActivityIndicator } from 'react-native';
+import { Button } from 'react-native-elements'
 import { _launchCameraRoll, _takePhoto } from '../../services/CameraAPI'
 import ChooseCommunityMembers from "./chooseCommunityMembers";
 import { handleCreation } from './handleCommunityCreation'
+import { secondColor } from "../../shared/constants";
 import firebase from '../../services/firebaseConfig'
 import { CommunityHeader } from './communityHeader'
 
@@ -19,7 +20,9 @@ export default class CreateCommunity extends React.Component {
             commCover: 'http://placehold.it/360x166',
             adminID: '',
             loadingCreatorInfo: false,
-            friendsPicked: []
+            friendsPicked: [],
+            btnLoading: false,
+            disabled: false
         }
     }
 
@@ -36,6 +39,7 @@ export default class CreateCommunity extends React.Component {
             }
         })
         this.setState({ friendsPicked })
+
     }
 
     getUserInfo = async () => {
@@ -49,7 +53,7 @@ export default class CreateCommunity extends React.Component {
                     name: child.val().fullName,
                     avatar: child.val().avatar,
                     key: currentUid,
-                    selected:true,
+                    selected: true,
                     adminRole: true
                 }
             })
@@ -83,6 +87,11 @@ export default class CreateCommunity extends React.Component {
         this.setState({ commName })
     }
 
+    createComm = () => {
+        this.setState({ btnLoading: true, disabled: true })
+        handleCreation(this.state, this.navigate)
+    }
+
     render() {
 
         return (
@@ -100,7 +109,7 @@ export default class CreateCommunity extends React.Component {
                     setCommNameState={this.setCommNameState}
                 />
 
-                <View style={{ borderWidth: 1, borderColor: 'blue', margin: 15 }}>
+                <View style={{ margin: 15 }}>
                     {this.state.loadingCreatorInfo ?
                         < ChooseCommunityMembers
                             friends={this.state.friendsPicked}
@@ -109,12 +118,14 @@ export default class CreateCommunity extends React.Component {
                         : <ActivityIndicator size="large" color="blue" style={{ paddingTop: 275 }} />
                     }
                 </View>
-
-                <View style={{ alignItems: 'center', marginTop: 25 }}>
+                <View style={{ paddingHorizontal: 15}}>
                     <Button
-                        title="CREATE"
-                        onPress={() => handleCreation(this.state, this.navigate)}
-                    />
+                        loading={this.state.btnLoading}
+                        disabled={this.state.disabled}
+                        loadingProps={{ size: 'small' }}
+                        title="Create"
+                        color={secondColor}
+                        onPress={() => this.createComm()} />
                 </View>
             </View>
         );

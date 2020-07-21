@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Text, View, StatusBar, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, View, StatusBar, FlatList, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import * as firebase from 'firebase'
 
 import { firebaseConfig } from "../services/firebaseConfig";
@@ -20,30 +20,59 @@ export default class App extends React.Component {
     this.navigate = this.props.navigation.navigate
     this.currentUser = firebase.auth().currentUser.uid
     this.state = {
-      chats: [], //store chats messages
-      Messages: [],// do nothing
-      list: [], //retrieve rooms addresses from users' data
-      flag1: false, //makes sure that app will retrieve only one msg from chat
-      hiddenChats: false,
-      hiddenList: [],
+      recentMessages: [],
+      hiddenChats: [],
+      hiddenChat: false,
       ShowHiddenList: false
     }
   }
 
-
   componentDidMount() {
-    this.getUserCommKey()
+    this.getUserRoomsKey()
   }
 
-  getUserCommKey = () => {
+  getUserRoomsKey = () => {
     let list = []
     db.ref(`authenticatedUsers/${this.currentUser}/rooms`)
       .on('value', snap => {
         snap.forEach(child => {
-          list.push({ roomKey: child.key })
+          list.push({ roomKey: child.key, hidden: child.val().hidden })
         })
       })
     this.setState({ list })
+    this.getLastestMsgs(list)
+  }
+
+  getLastestMsgs = (list) => {
+    let recentMessages = [], hiddenChats = []
+    list.forEach(element => {
+      db.ref(`messages/${element.roomKey}`).orderByChild('timestamp').limitToLast(1)
+        .on('value', snap => {
+          snap.forEach(child => {
+            let obj = {
+              msgKey: child.key,
+              roomKey: element.roomKey,
+              reply: child.val().reply,
+              timestamp: child.val().timestamp,
+              text: child.val().text,
+              user: child.val().user,
+              hidden: element.hidden
+            }
+
+            if (!element.hidden)
+              recentMessages.push(obj)
+            else {
+              {
+                hiddenChats.push(obj)
+                this.setState({ hiddenChat: true })
+              }
+            }
+          })
+        })
+    })
+
+    recentMessages.sort(this.compareValues('timestamp', 'desc'))
+    this.setState({ recentMessages, hiddenChats })
   }
 
   toggleHiddenList = () => {
@@ -52,78 +81,52 @@ export default class App extends React.Component {
     }))
   }
 
-  ShowChat = (roomKey) => {//update chat in database
-    if (this.state.hiddenList.length == 0) this.setState({ hiddenChats: false })
-    let hiddenList = this.state.hiddenList
-    hiddenList.forEach(child => {
-      if (child.roomKey == roomKey) {
-        db.ref(child.address).update({
-          hidden: false
-        })
-      } else {
-        db.ref(child.address).update({
-          hidden: true
-        })
-      }
-      this.getChats(this.state.list)
-    })
-  }
+  manageChat = (roomKey, show) => {
+    let hiddenChatTemp = [], recentMessagesTemp = []
+    if (show) {
+      db.ref(`authenticatedUsers/${this.currentUser}/rooms/${roomKey}/`).update(
+        { hidden: false }
+      )
 
-  getChats(list) {
-    let hiddenCh = []
-    let chats = []
-    list.forEach(element => {
-      let hidden, msgKey = ''
-
-      db.ref('/' + element.room_route).on('value', snap => {
-
-        //this.latestTimestamp(child, chatName, timestamp, flag1) // where i compare messages' timestamps. and only stores one
-        snap.forEach(child => {
-          if (!hidden) {
-            if (timestamp <= child.val().timestamp) {
-              timestamp = child.val().timestamps
-              if (flag1) chats.pop()
-              chats.push({ // pushing choosing message to the array.
-                key: child.key,
-                content: child.val().content,
-                timestamp: child.val().timestamp,
-                uri: child.val().uri,
-                senderId: child.val().senderId,
-                chatName: chatName,
-                uri: child.val().uri,
-                hidden: hidden,
-                id: id,
-                address: element.room_route
-              })
-              flag1 = true
-            }
+      this.state.hiddenChats.forEach(
+        element => {
+          element.hidden = false
+          if (element.roomKey == roomKey) {
+            this.state.recentMessages.push(element)
+          } else {
+            hiddenChatTemp.push(element)
           }
+        }
+      )
 
-          else {
-            this.setState({ hiddenChats: true })
-            if (timestamp <= child.val().timestamp) {
-              timestamp = child.val().timestamps
-              if (flag1) chats.pop()
-              hiddenCh.push({ // pushing choosing message to the array.
-                key: child.key,
-                content: child.val().content,
-                timestamp: child.val().timestamp,
-                uri: child.val().uri,
-                senderId: child.val().senderId,
-                chatName: chatName,
-                uri: child.val().uri,
-                hidden: hidden,
-                id: id,
-                address: element.room_route
-              })
-              flag1 = true
-            }
+      this.setState({ hiddenChats: hiddenChatTemp })
+    }
+    else {
+      db.ref(`authenticatedUsers/${this.currentUser}/rooms/${roomKey}/`).update(
+        { hidden: true }
+      )
+
+      this.state.recentMessages.forEach(
+        element => {
+          if (element.roomKey == roomKey) {
+            element.hidden = true
+            this.state.hiddenChats.push(element)
+          } else {
+            recentMessagesTemp.push(element)
           }
-        })
-        this.setState({ chats: chats, hiddenList: hiddenCh })
-      })
-    })
-    chats.sort(this.compareValues('timestamp', 'desc'))// sort arrays with messages by its timestamps
+        }
+      )
+      this.setState({ recentMessages: recentMessagesTemp })
+    }
+
+    this.state.recentMessages.sort(this.compareValues('timestamp', 'desc'))
+    this.state.hiddenChats.sort(this.compareValues('timestamp', 'desc'))
+
+    if (this.state.hiddenChats.length == 0) {
+      this.setState({ hiddenChat: false })
+    } else {
+      this.setState({ hiddenChat: true })
+    }
   }
 
   compareValues(key, order = 'asc') { //Object sorting function
@@ -131,7 +134,6 @@ export default class App extends React.Component {
       if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
         return 0;
       }
-
       const varA = (typeof a[key] === 'string')
         ? a[key].toUpperCase() : a[key];
       const varB = (typeof b[key] === 'string')
@@ -151,66 +153,53 @@ export default class App extends React.Component {
 
   render() {
     return (
-      <View style={{ marginTop: StatusBar.currentHeight, flex: 1 }}>
+      <View style={{
+        marginTop: StatusBar.currentHeight, flex: 1, backgroundColor: '#f0f2ff'
+      }} >
         <Header
           center
           title='Recent Chat'
         />
-        <ScrollView style={{
-          backgroundColor: 'white',
-          flex: 1, padding: 10
-        }}>
-          <View style={{ backgroundColor: '#d6f1ff', borderRadius: 15, margin: 5 }}>
+          <ScrollView>
             <FlatList
-              data={this.state.chats}
+              data={this.state.recentMessages}
               renderItem={({ item }) => (
                 <ChatHeader
-                  sender={item.senderId}
-                  content={item.content}
-                  timestamp={item.timestamp}
-                  chatName={item.chatName}
-                  uri={item.uri}
-                  HideChat={this.HideChat}
-                  id={item.id}
-                  hidden={item.hidden}
-                  ShowChat={this.ShowChat}
+                  item={item}
+                  manageChat={this.manageChat}
+                  navigate={this.navigate}
                 />
               )} />
-          </View>
-          <View>
-            <TouchableOpacity onPress={this.HiddenListOpt}>
+            <View>
               {
-                this.state.hiddenChats ?
-                  <Text style={{ paddingLeft: 10, fontWeight: 'bold', color: 'grey' }}> Hidden({this.state.hiddenList.length}) </Text>
-                  : <Text></Text>
+                this.state.hiddenChat ?
+                  <TouchableOpacity
+                    onPress={() => this.toggleHiddenList()}
+                  >
+                    <Text style={{
+                      fontWeight: 'bold', textAlign: 'center', color: '#0e166360', paddingTop: 3
+                    }}>
+                      {'hidden Chats (' + this.state.hiddenChats.length + ')'}
+                    </Text>
+                  </TouchableOpacity>
+                  : null
               }
-            </TouchableOpacity>
-          </View>
-          {
-            this.state.ShowHiddenList ?
-              <View style={{ backgroundColor: '#d1d1d1', borderRadius: 15, margin: 5 }}>
-
+            </View>
+            {
+              this.state.ShowHiddenList ?
                 <FlatList
-                  data={this.state.hiddenList}
+                  data={this.state.hiddenChats}
                   renderItem={({ item }) => (
-                    <Comp
-                      sender={item.senderId}
-                      content={item.content}
-                      timestamp={item.timestamp}
-                      chatName={item.chatName}
-                      uri={item.uri}
-                      HideChat={this.HideChat}
-                      id={item.id}
-                      hidden={item.hidden}
-                      ShowChat={this.ShowChat}
+                    <ChatHeader
+                      item={item}
+                      manageChat={this.manageChat}
+                      navigate={this.navigate}
                     />
                   )}
                 />
-
-              </View> : null
-          }
-
-        </ScrollView>
+                : null
+            }
+          </ScrollView>
         <Tab active="inbox" navigation={this.props.navigation} />
 
       </View>

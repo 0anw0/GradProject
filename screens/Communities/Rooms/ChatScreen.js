@@ -1,5 +1,5 @@
 import React from "react";
-import { TouchableOpacity, StyleSheet, View, Alert, StatusBar } from "react-native";
+import { TouchableOpacity, StyleSheet, View, Alert, StatusBar, Dimensions } from "react-native";
 import { GiftedChat } from "react-native-gifted-chat";
 import { Icon } from 'react-native-elements'
 import * as firebase from 'firebase'
@@ -15,14 +15,10 @@ export default class ChatScreen extends React.Component {
     constructor(props) {
         super(props)
         this.currentUser = firebase.auth().currentUser
-        this.communityKey = this.props.navigation.getParam("communityKey")
         this.roomKey = this.props.navigation.getParam("roomKey")
-        this.roomRef = firebase.database()
-            .ref(`messages/${this.communityKey}/${this.roomKey}`)
-        this.uploadedImages = firebase.database()
-            .ref(`rooms/${this.communityKey}/${this.roomKey}/uploadedImages`)
-        this.chatLinks = firebase.database()
-            .ref(`rooms/${this.communityKey}/${this.roomKey}/chatLinks`)
+        this.roomRef = firebase.database().ref(`messages/${this.roomKey}`)
+        this.uploadedImages = firebase.database().ref(`rooms/${this.roomKey}/uploadedImages`)
+        this.chatLinks = firebase.database().ref(`rooms/${this.roomKey}/chatLinks`)
         this.state = {
             messages: [],
             pickedImage: null,
@@ -41,6 +37,7 @@ export default class ChatScreen extends React.Component {
     send = messages => {
         messages.forEach(item => {
             const message = {
+                reply: false,
                 text: item.text,
                 image: this.state.pickedImage,
                 video: this.state.pickedVideo,
@@ -110,6 +107,7 @@ export default class ChatScreen extends React.Component {
     }
 
     render() {
+
         const chat = <GiftedChat
             messages={this.state.messages}
             onSend={this.send}
@@ -124,6 +122,7 @@ export default class ChatScreen extends React.Component {
                     </TouchableOpacity>
                 </View>
             )}
+
         />;
 
         return (
@@ -133,12 +132,10 @@ export default class ChatScreen extends React.Component {
                     icon='users' type='feather'
                     onPress={() => this.props.navigation.navigate("RoomMembers", {
                         roomKey: this.roomKey,
-                        communityKey: this.communityKey,
                     })}
                     icon2='perm-media' type2='material'
                     onPress2={() => this.props.navigation.navigate("UploadedMediaStack", {
                         roomKey: this.roomKey,
-                        communityKey: this.communityKey
                     })
                     }
                 />
