@@ -1,36 +1,43 @@
 import React from "react";
-import * as firebase from 'firebase'
+import * as firebase from "firebase";
 import { View, Text, Image, StyleSheet, Dimensions } from "react-native";
 import { secondColor, $grey_2, $grey_1 } from "./constants";
 import Avatar from "./Avatar";
 
 export default class WelcomeHeader extends React.Component {
   constructor(props) {
-    super(props)
-    this.uid=firebase.auth().currentUser.uid
+    super(props);
+    this.uid = firebase.auth().currentUser.uid;
     this.state = {
-      name: ''
-    }
+      name: "",
+    };
   }
   componentDidMount() {
-    firebase.database().ref(`authenticatedUsers/${this.uid}/fullName`)
-    .once('value', snap =>{
-      this.setState({ name: snap.val()})
-    })
+    firebase
+      .database()
+      .ref(`authenticatedUsers/${this.uid}/fullName`)
+      .once("value", (snap) => {
+        this.setState({ name: snap.val() });
+      });
   }
 
   render() {
     return (
       <View style={styles.header}>
         <Text style={styles.headerHello}>Hello,</Text>
-        <Text style={styles.headerUser}>{this.state.name}</Text>
+        <Text style={styles.headerUser}>{this.state.name.split(' ')[0]}!</Text>
         <View
-          style={{ position: "relative", left: Dimensions.get('window').width * 0.27 }}
+          style={{
+            position: "absolute",
+            right: Dimensions.get("window").width * 0.05,
+          }}
         >
           <Avatar
             width={40}
             height={40}
-            uri={firebase.auth().currentUser.photoURL || 'http://placehold.it/45'}
+            uri={
+              firebase.auth().currentUser.photoURL || "http://placehold.it/45"
+            }
             borderWidth={0.8}
             borderColor={secondColor}
           />

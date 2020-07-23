@@ -46,7 +46,7 @@ export default class SignIn extends React.Component {
           Welcome Back <Text style={styles.heading2}>:)</Text>
         </Text>
         <Divider style={styles.divider} />
-        <View style={{ paddingTop: 20, alignItems: "center" }}>
+        <View style={{ paddingTop: 20, alignItems: "center", flex: 1 }}>
           <TextInput
             placeholder="Email"
             autoCapitalize="none"
@@ -70,30 +70,23 @@ export default class SignIn extends React.Component {
               this.handleSignIn(this.state.email, this.state.password)
             }
           />
-          <KeyboardSpacer />
-        </View>
-        <View style={{ marginLeft: 20 }}>
-          <TouchableOpacity
-            onPress={() => this.props.navigation.navigate("ForgotPassword")}
-          >
-            <Text style={[styles.already, { fontWeight: "bold" }]}>
-              Forgot your password?
-            </Text>
-          </TouchableOpacity>
-          <View style={{ flexDirection: "row" }}>
-            <Text style={styles.already}>Already have an account ?</Text>
+          <View style={{ width: '100%',marginLeft: 40 }}>
             <TouchableOpacity
-              onPress={() => this.props.navigation.navigate("SignUp")}
+              onPress={() => this.props.navigation.navigate("ForgotPassword")}
             >
-              <Text style={styles.sign}>Sign Up</Text>
+              <Text style={[styles.sign, { fontWeight: "bold" }]}>
+                Forgot your password?
+              </Text>
             </TouchableOpacity>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={styles.already}>Already have an account ?</Text>
+              <TouchableOpacity
+                onPress={() => this.props.navigation.navigate("SignUp")}
+              >
+                <Text style={styles.sign}>Sign Up</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        <View style={styles.footerContainer}>
-          <Divider style={styles.divider} />
-          <Text style={styles.footerText}>
-            All Rights Reserved to <Text style={styles.footerLogo}>Zone</Text>
-          </Text>
         </View>
       </ImageBackground>
     );

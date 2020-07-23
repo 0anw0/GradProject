@@ -22,7 +22,6 @@ export default class SignUp extends React.Component {
     fullName: "",
     email: "",
     phone: "",
-    username: "",
     password: "",
     rePassword: "",
   };
@@ -37,14 +36,9 @@ export default class SignUp extends React.Component {
     });
   };
 
-  handleSignUP = (avatar, fullName, email, username, password, rePassword) => {
+  handleSignUP = (avatar, fullName, email, password, rePassword) => {
     // Form Validation
-    if (
-      fullName.length == 0 ||
-      email.length == 0 ||
-      username.length == 0 ||
-      password.length == 0
-    ) {
+    if (fullName.length == 0 || email.length == 0 || password.length == 0) {
       Alert.alert("Please complete the entire fields");
       return;
     }
@@ -67,7 +61,6 @@ export default class SignUp extends React.Component {
         firebase.database().ref("authenticatedUsers").child(res.user.uid).set({
           fullName: fullName.trim(),
           email: email.trim(),
-          username: username.trim(),
           avatar,
         });
         res.user.updateProfile({ displayName: fullName, photoURL: avatar });
@@ -89,17 +82,19 @@ export default class SignUp extends React.Component {
           Hello, <Text style={styles.heading2}>Beautiful,</Text>
         </Text>
         <Divider style={styles.divider} />
-        <View style={{ alignItems: "center", padding: 20 }}>
-          <Avatar
-            rounded
-            showEditButton
-            onEditPress={this.pickAvatar}
-            size={"large"}
-            icon={{ name: "user", type: "font-awesome" }}
-            source={{
-              uri: this.state.avatar ? this.state.avatar : profileIcon,
-            }}
-          />
+        <View style={{ alignItems: "center", marginTop: 30, flex: 1 }}>
+          <View style={{ marginBottom: 5 }}>
+            <Avatar
+              rounded
+              showEditButton
+              onEditPress={this.pickAvatar}
+              size={"large"}
+              icon={{ name: "user", type: "font-awesome" }}
+              source={{
+                uri: this.state.avatar ? this.state.avatar : profileIcon,
+              }}
+            />
+          </View>
           <TextInput
             style={styles.TextInput}
             placeholder="Full Name"
@@ -112,13 +107,6 @@ export default class SignUp extends React.Component {
             placeholder="E-Mail"
             value={this.state.email}
             onChangeText={(email) => this.setState({ email })}
-          />
-          <TextInput
-            autoCapitalize="none"
-            style={styles.TextInput}
-            placeholder="Username"
-            value={this.state.username}
-            onChangeText={(username) => this.setState({ username })}
           />
           <TextInput
             secureTextEntry
@@ -145,29 +133,21 @@ export default class SignUp extends React.Component {
                 this.state.avatar,
                 this.state.fullName,
                 this.state.email,
-                this.state.username,
                 this.state.password,
                 this.state.rePassword
               )
             }
           />
+          <View style={{ marginLeft: 40, flexDirection: "row", width: "100%" }}>
+            <Text style={styles.already}>Already have an account ?</Text>
+            <TouchableOpacity
+              onPress={() => this.props.navigation.navigate("SignIn")}
+            >
+              <Text style={styles.sign}>Sign in</Text>
+            </TouchableOpacity>
+          </View>
         </View>
         <KeyboardSpacer />
-        <View style={{ marginLeft: 20, flexDirection: 'row' }}>
-          <Text style={styles.already}>Already have an account ?</Text>
-          <TouchableOpacity
-            onPress={() => this.props.navigation.navigate("SignIn")}
-          >
-            <Text style={styles.sign}>Sign in</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.footerContainer}>
-          <Divider style={styles.divider} />
-          <Text style={styles.footerText}>
-            {"\u00A9"}
-            Copyrights to <Text style={styles.footerLogo}>Zone</Text>
-          </Text>
-        </View>
       </ImageBackground>
     );
   }

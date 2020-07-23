@@ -11,6 +11,9 @@ import { Icon } from "react-native-elements";
 import { secondColor, $grey_2, $grey_1, $grey_3 } from "../../shared/constants";
 import Avatar from "../../shared/Avatar";
 import Tab from "../../shared/TabBar";
+import ListModal from "../../shared/Modals/ListModal";
+import SlideModal from "../../shared/Modals/SlideModal";
+import EditProfileModal from "./Modals/EditProfileModal";
 import firebase from "../../services/firebaseConfig";
 
 export default class MyProfile extends React.Component {
@@ -18,17 +21,35 @@ export default class MyProfile extends React.Component {
     super(props);
     this.currentUser = firebase.auth().currentUser;
     this.navigate = this.props.navigation.navigate;
-    this.communities = this.props.navigation.getParam("communities");
     this.state = {
       avatar: "",
       profName: "",
       profBio: "Hello from the other side",
       friends: [],
+      communities: [],
+      commKeys: [],
+      comModalVisible: false,
+      friendsModalVisible: false,
+      editProfileModalVisible: false,
     };
   }
-  z;
+
+  // Life cycle executed before rendering on both client & server side (Will be deprecated soon => Find alternative)
+  componentWillMount() {
+    firebase
+      .database()
+      .ref(`authenticatedUsers/${this.currentUser.uid}/communities`)
+      .on("value", (snap) => {
+        var commKeys = [];
+        snap.forEach((child) => {
+          commKeys.push(child.key);
+        });
+        this.setState({ commKeys });
+      });
+  }
 
   componentDidMount() {
+    // Get Profile Details
     firebase
       .database()
       .ref(`authenticatedUsers/${this.currentUser.uid}`)
@@ -39,6 +60,8 @@ export default class MyProfile extends React.Component {
           profBio: child.val().bio,
         });
       });
+
+    // Get Friends
     firebase
       .database()
       .ref("authenticatedUsers")
@@ -55,6 +78,26 @@ export default class MyProfile extends React.Component {
         });
         this.setState({ friends });
       });
+
+    // Get Communities
+    firebase
+      .database()
+      .ref(`communities`)
+      .on("value", (snap) => {
+        var communities = [];
+        var keys = this.state.commKeys;
+        snap.forEach((child) => {
+          if (keys.includes(child.key))
+            communities.push({
+              name: child.val().name,
+              description: child.val().description,
+              avatar: child.val().avatar,
+              cover: child.val().cover,
+              key: child.key,
+            });
+        });
+        this.setState({ communities });
+      });
   }
 
   logout = async () => {
@@ -65,6 +108,18 @@ export default class MyProfile extends React.Component {
       console.log(e);
     }
   };
+
+  setComModalVisible(visible) {
+    this.setState({ comModalVisible: visible });
+  }
+
+  setFriendsModalVisible(visible) {
+    this.setState({ friendsModalVisible: visible });
+  }
+
+  setEditProfileModalVisible(visible) {
+    this.setState({ editProfileModalVisible: visible });
+  }
 
   render() {
     const more = (list) => {
@@ -78,6 +133,7 @@ export default class MyProfile extends React.Component {
         );
       }
     };
+
     return (
       <View
         style={{
@@ -87,10 +143,51 @@ export default class MyProfile extends React.Component {
           backgroundColor: $grey_3,
         }}
       >
+        <ListModal
+          closeModal={() => this.setState({ comModalVisible: false })}
+          listModalVisible={this.state.comModalVisible}
+          setListModalVisible={() => {
+            this.setComModalVisible(false);
+          }}
+          title="Communities"
+          data={this.state.communities}
+          toScreen="CommunityOverview"
+          navigation={this.props.navigation}
+        />
+
+        <ListModal
+          closeModal={() => this.setState({ friendsModalVisible: false })}
+          listModalVisible={this.state.friendsModalVisible}
+          setListModalVisible={() => {
+            this.setFriendsModalVisible(false);
+          }}
+          title="Friends"
+          data={this.state.friends}
+          toScreen="OtherProfile"
+          navigation={this.props.navigation}
+        />
+
+        <SlideModal
+          closeModal={() => this.setState({ editProfileModalVisible: false })}
+          modalVisible={this.state.editProfileModalVisible}
+          setModalVisible={() => {
+            this.setEditProfileModalVisible(false);
+          }}
+          navigation={this.props.navigation}
+        >
+          <EditProfileModal />
+        </SlideModal>
+
         {/* Buttons */}
         <TouchableOpacity
           style={styles.editProfile}
-          onPress={() => this.navigate("EditProfile")}
+          onPress={
+            () =>
+              this.setEditProfileModalVisible(
+                !this.state.editProfileModalVisible
+              )
+            // () => this.navigate("EditProfile")
+          }
         >
           <Icon name="edit" type="feather" color={secondColor} size={30} />
         </TouchableOpacity>
@@ -111,54 +208,64 @@ export default class MyProfile extends React.Component {
             />
             <Text style={styles.profName}>{this.state.profName}</Text>
             <Text style={styles.profBio}>
-              {this.state.profBio || "This is my bio"}
+              {this.state.profBio || "Bio pluggined here"}
             </Text>
           </View>
           <TouchableOpacity
             style={styles.listBox}
-            onPress={() => <ListModal />}
+            onPress={() =>
+              this.setFriendsModalVisible(!this.state.comModalVisible)
+            }
           >
             <View>
               <View style={styles.titleBox}>
                 <Text style={styles.titleText}>Your Friends</Text>
               </View>
               <View style={styles.boxAvatar}>
-                {this.state.friends.map((item) => (
-                  <View style={{ paddingHorizontal: 5 }}>
-                    <Avatar
-                      width={40}
-                      height={40}
-                      uri={item.avatar}
-                      borderWidth={0.8}
-                      borderColor={secondColor}
-                    />
-                    {more(this.state.friends)}
-                  </View>
-                ))}
+                {this.state.friends.map((item, index) => {
+                  if (index < 5) {
+                    return (
+                      <View style={{ paddingHorizontal: 3 }}>
+                        <Avatar
+                          width={40}
+                          height={40}
+                          uri={item.avatar}
+                          borderWidth={0.8}
+                          borderColor={secondColor}
+                        />
+                        {more(this.state.friends)}
+                      </View>
+                    );
+                  }
+                })}
               </View>
             </View>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.listBox}
-            onPress={() => this.props.navigation.goBack(null)}
+            onPress={() => this.setComModalVisible(!this.state.comModalVisible)}
           >
             <View>
               <View style={styles.titleBox}>
                 <Text style={styles.titleText}>Your communities</Text>
               </View>
               <View style={styles.boxAvatar}>
-                {this.communities.map((item) => (
-                  <View style={{ paddingHorizontal: 5 }}>
-                    <Avatar
-                      width={40}
-                      height={40}
-                      uri={item.image}
-                      borderWidth={0.8}
-                      borderColor={secondColor}
-                    />
-                    {more(this.communities)}
-                  </View>
-                ))}
+                {this.state.communities.map((item, index) => {
+                  if (index < 5) {
+                    return (
+                      <View style={{ paddingHorizontal: 3 }}>
+                        <Avatar
+                          width={40}
+                          height={40}
+                          uri={item.avatar}
+                          borderWidth={0.8}
+                          borderColor={secondColor}
+                        />
+                      </View>
+                    );
+                  }
+                })}
+                {more(this.state.communities)}
               </View>
             </View>
           </TouchableOpacity>

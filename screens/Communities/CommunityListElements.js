@@ -19,7 +19,7 @@ export function CommunityListElements({
             return (
               <TouchableOpacity
                 onPress={() => {
-                  navigate("CommunityOverview", { communityKey: item.key });
+                  navigate("CommunityOverview", { key: item.key });
                 }}
               >
                 <View style={styles.item}>

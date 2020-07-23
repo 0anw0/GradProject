@@ -11,6 +11,7 @@ import {
 import { Icon } from "react-native-elements";
 import * as firebase from "firebase";
 
+import SlideModal from "../../shared/Modals/SlideModal";
 import MiddleFloatingIcon from "../../shared/FloatingIcons/Middle";
 import listenForPosts from "../../shared/postItems/listenForPosts";
 import RenderPosts from "../../shared/postItems/renderPosts";
@@ -19,12 +20,14 @@ import PopMenu from "../../shared/PopMenu";
 import Avatar from "../../shared/Avatar";
 import { secondColor } from "../../shared/constants";
 import styles from "./communityStyles";
+import RoomsList from "./Modals/RoomsList";
+import RoomOverview from "./Modals/RoomOverview";
 
 export default class CommunityOverview extends React.Component {
   constructor(props) {
     super(props);
     this.navigate = this.props.navigation.navigate;
-    this.communityKey = this.props.navigation.getParam("communityKey");
+    this.communityKey = this.props.navigation.getParam("key");
     this.state = {
       communityDetails: {},
       posts: [],
@@ -32,11 +35,16 @@ export default class CommunityOverview extends React.Component {
       hasPosts: true,
       refreshing: false,
       communityKey: "",
+      roomsModalVisible: false,
     };
   }
 
+  setRoomsModalVisible(visible) {
+    this.setState({ roomsModalVisible: visible });
+  }
+
   componentDidMount() {
-    let communityKey = this.props.navigation.getParam("communityKey");
+    let communityKey = this.props.navigation.getParam("key");
     this.setState({ communityKey });
     listenForPosts(
       true,
@@ -97,11 +105,23 @@ export default class CommunityOverview extends React.Component {
   render() {
     return (
       <View style={{ marginTop: StatusBar.currentHeight, flex: 1 }}>
+        <SlideModal
+          closeModal={() => this.setState({ roomsModalVisible: false })}
+          modalVisible={this.state.roomsModalVisible}
+          setModalVisible={() => {
+            this.setRoomsModalVisible(false);
+          }}
+          navigation={this.props.navigation}
+        >
+          <RoomsList commumityName={this.state.communityDetails.name} />
+        </SlideModal>
+
         <MiddleFloatingIcon
           icon="md-list"
           type="ionicon"
-          onPress={() =>
-            this.navigate("CommunityRooms", { communityKey: this.communityKey })
+          onPress={
+            () => this.setRoomsModalVisible(!this.state.roomsModalVisible)
+            // this.navigate("CommunityRooms", { communityKey: this.communityKey })
           }
         />
 
@@ -166,7 +186,7 @@ export default class CommunityOverview extends React.Component {
           </View>
 
           {/* <Divider style={{ backgroundColor: '#AAA', marginBottom: 20 }} /> */}
-          <View style={{padding: 13}}>
+          <View style={{ padding: 13 }}>
             <RenderPosts
               loaded={this.state.loaded}
               hasCommunities={true}

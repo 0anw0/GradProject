@@ -2,7 +2,8 @@ import React from "react";
 import { View, Text, TouchableOpacity, Alert } from "react-native";
 
 import { deletePost, hidePost, reportPost } from "./deleteEditReport";
-import { Avatar } from "react-native-elements";
+import {secondColor} from '../constants'
+import Avatar from "../Avatar";
 import Pop from "../PopMenu";
 import styles from "./postStyles";
 
@@ -51,7 +52,13 @@ export function PostHeader({
         </View>
         <View style={styles.post}>
           <View style={styles.userDetails}>
-            <Avatar rounded size={50} source={{ userAvatar }} />
+            <Avatar
+              uri={userAvatar}
+              width={50}
+              height={50}
+              borderWidth={1}
+              borderColor={secondColor}
+            />
             <Text style={styles.userName}>{userName}</Text>
             <View style={styles.communities}>
               {!headingFromCommunity ? (

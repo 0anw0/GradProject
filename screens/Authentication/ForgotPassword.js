@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, KeyboardAvoidingView, TouchableHighlight, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
-import { secondColor, firstColor } from '../../shared/constants'
+import { secondColor, headlineColor, $grey_1 } from '../../shared/constants'
 import firebase from '../../services/firebaseConfig'
 
 export default class ForgotPassword extends React.Component {
@@ -20,7 +20,7 @@ export default class ForgotPassword extends React.Component {
     }
     render() {
         return (
-            <KeyboardAvoidingView style={styles.screenContainer} behavior="padding" enabled>
+            <View style={styles.screenContainer}>
                 <View style={styles.forgetContainer}>
                     <Text style={styles.header}>Forgot Password ?</Text>
                     <Text style={styles.paragraph}>We need your registered email address to send your password reset</Text>
@@ -34,15 +34,15 @@ export default class ForgotPassword extends React.Component {
                         autoCapitalize='none'
                         autoCompleteType="off"
                     />
-                    <Button title="RESET PASSWORD" onPress={this.searchEmail} buttonStyle={styles.button} />
+                    <Button title="Reset Password" onPress={this.searchEmail} buttonStyle={styles.button} />
                 </View>
                 <View style={styles.acountExistQuestionContainer}>
                     <Text style={styles.paragraph}>Don't have an account ?</Text>
                     <TouchableHighlight onPress={() => this.props.navigation.navigate('SignUp')}>
-                        <Text style={styles.regester}>Sign Up</Text>
+                        <Text style={styles.register}>Sign Up</Text>
                     </TouchableHighlight>
                 </View>
-            </KeyboardAvoidingView>
+            </View>
         );
     }
 }
@@ -76,14 +76,17 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     textInput: {
-        width: 285, height: 39,
+        width: 322,
+        height: 39,
         fontSize: 20,
-        borderBottomWidth: 1,
-        borderColor: '#9b9b9b',
-        marginBottom: 12
+        borderBottomWidth: 0.5,
+        borderColor: $grey_1,
+        marginBottom: 15,
+        opacity: 1,
+        color: headlineColor
     },
-    regester: {
-        fontSize: 20,
+    register: {
+        fontSize: 18,
         fontWeight: "bold",
         color: secondColor
     },
@@ -95,7 +98,8 @@ const styles = StyleSheet.create({
         marginTop: 12,
         marginBottom: 30,
         color: secondColor,
-        width: 285, height: 39,
+        width: 322,
+        height: 45,
         backgroundColor: secondColor
     },
 }) 

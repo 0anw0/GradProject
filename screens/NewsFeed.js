@@ -82,7 +82,7 @@ export default class NewsFeed extends React.Component {
   render() {
     return (
       <View style={{ paddingTop: StatusBar.currentHeight, flex: 1 }}>
-        <WelcomeHeader navigate={this.navigate}/>
+        <WelcomeHeader navigate={this.navigate} />
         <ScrollView
           style={{ padding: 12, flex: 1, marginBottom: 60 }}
           refreshControl={
@@ -92,10 +92,6 @@ export default class NewsFeed extends React.Component {
             />
           }
         >
-          {/* <Divider style={{ backgroundColor: '#AAA', marginBottom: 20 }} /> */}
-          {this.state.announcement ? (
-            <Announcement text="important announcement goes here!" />
-          ) : null}
           <RenderPosts
             loaded={this.state.loaded}
             hasCommunities={this.state.hasCommunities}

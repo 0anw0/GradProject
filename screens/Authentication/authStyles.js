@@ -1,12 +1,12 @@
 import { StyleSheet, StatusBar } from "react-native";
-import { secondColor, $grey_3 } from "../../shared/constants";
+import { secondColor, headlineColor, $grey_3, $grey_1, $grey_2 } from "../../shared/constants";
 
 const styles = StyleSheet.create({
   heading: {
-    color: "#FFF",
-    marginBottom: 20,
+    color: secondColor,
+    marginBottom: 22,
     marginLeft: 20,
-    fontSize: 30,
+    fontSize: 27,
     fontStyle: 'italic',
     marginTop: 15,
   },
@@ -17,40 +17,39 @@ const styles = StyleSheet.create({
     opacity: 0.2,
     position: 'relative',
     bottom: 5,
-    backgroundColor: '#FFF'
+    backgroundColor: '#222'
   },
   TextInput: {
     width: 322,
     height: 39,
     fontSize: 20,
     borderBottomWidth: 0.5,
-    borderColor: "#FFF",
-    marginBottom: 12,
+    borderColor: $grey_1,
+    marginBottom: 15,
     opacity: 1,
-    color: '#FFF'
+    color: headlineColor
   },
   button: {
     marginTop: 15,
-    marginBottom: 15,
-    color: secondColor,
+    marginBottom: 20,
+    backgroundColor: secondColor,
     width: 322,
-    height: 42,
-    backgroundColor: "#FFFF",
+    height: 45,
   },
   buttonTitle: {
-    color: secondColor,
+    color: '#FFF',
     fontWeight: "bold",
     fontSize: 18,
   },
   already: {
     fontSize: 17,
-    color: "#FFF",
+    color: $grey_1,
     marginRight: 5
   },
   sign: {
     fontSize: 17,
     fontWeight: "bold",
-    color: "#FFF",
+    color: secondColor,
   },
   back: {
     flex: 1,
@@ -59,14 +58,13 @@ const styles = StyleSheet.create({
     backgroundColor: secondColor,
   },
   footerContainer: {
-      position: 'absolute',
-      bottom: 0,
+      alignSelf: 'flex-end',
       width: '100%',
       paddingVertical: 20,
   },
   footerText: {
       textAlign: 'center',
-      color: '#FFF',
+      color: secondColor,
       opacity: 0.6,
       fontSize: 14,
       fontStyle: 'italic',
