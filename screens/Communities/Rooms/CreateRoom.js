@@ -77,6 +77,7 @@ export default class CreateRoom extends React.Component {
 
         if (this.state.newRoom === '') {
             Alert.alert('please, Enter Room Name!')
+            this.setState({ btnLoading: false, disabled: false })
             return;
         }
 

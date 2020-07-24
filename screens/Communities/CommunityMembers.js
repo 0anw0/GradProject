@@ -37,7 +37,7 @@ export default class CommunityMembers extends React.Component {
             <View style={styles.item}>
                 <Avatar rounded size="medium" source={{ uri: item.avatar }} />
                 <View>
-                    <Text style={styles.memberName}>{item.name}  {item.adminRole ? 'Admin': null}</Text>
+                    <Text style={styles.memberName}>{item.name}  {item.adminRole ? 'Admin' : null}</Text>
                 </View>
             </View>
         )
@@ -46,8 +46,8 @@ export default class CommunityMembers extends React.Component {
                 <Header
                     title='Members'
                     icon='user-plus' type='font-awesome'
-                    onPress={() => this.props.navigation.navigate('ChooseMembers', { 
-                        backScreen: "CommunityMembers",
+                    onPress={() => this.props.navigation.navigate('ChooseMembers', {
+                        backScreen: "CommunityMembers", communityKey: this.communityKey
                         //existedMembers: this.state.communityMembers
                     })}
                 />

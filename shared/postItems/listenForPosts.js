@@ -45,14 +45,14 @@ getUserPosts = async (postsContainer) => {
                     let commNames = [], postImages = []
                     for (const child in communities) {
                         //console.log('communities:-', communities[child])
-                        let name =''    
+                        let name = ''
                         firebase.database()
-                        .ref(`communities/${communities[child].key}/name`)
-                        .on('value' ,commNameSnap => {
-                            name = commNameSnap.val()
-                        })
+                            .ref(`communities/${communities[child].key}/name`)
+                            .on('value', commNameSnap => {
+                                name = commNameSnap.val()
+                            })
                         commNames.push({
-                            name:name,
+                            name: name,
                             key: communities[child].key
                         })
                     }
@@ -127,10 +127,9 @@ const listenForPosts =
             if (posts.length == 0) {
                 changehasPostsState
             }
+            updatePosts(posts)
         } catch (e) {
             console.log('error in loading posts:- ', e)
-        } finally {
-            updatePosts(posts)
         }
     }
 

@@ -64,12 +64,17 @@ export default class SignUp extends React.Component {
       .auth()
       .createUserWithEmailAndPassword(email.trim(), password.trim())
       .then((res) => {
-        firebase.database().ref("authenticatedUsers").child(res.user.uid).set({
+        firebase.database().ref(`authenticatedUsers/${res.user.uid}`).set({
           fullName: fullName.trim(),
           email: email.trim(),
           username: username.trim(),
           avatar,
         });
+
+        firebase.database().ref(`authenticatedUsers/${res.user.uid}/PersonalInfo`).set({
+          fullName: fullName.trim()
+        })
+         
         res.user.updateProfile({ displayName: fullName, photoURL: avatar });
         res.user.sendEmailVerification();
       })

@@ -19,9 +19,7 @@ export const ChatHeader = function ({ item, manageChat ,navigate
     return (
         <View style={{ marginTop: 5, marginHorizontal:5 }}>
             <ListItem
-                onPress={navigate('ChatScreen', {
-                    roomKey: item.roomKey
-                })}
+                onPress={() => navigate('ChatScreen', { roomKey : item.roomKey })}
                 containerStyle={{
                     borderRadius: 10,
                     backgroundColor: item.hidden ? '#ffffff50' : '#ffffff'

@@ -17,9 +17,7 @@ export default class Onboard2 extends React.Component {
           <View style={{ alignItems: "center" }}>
             <Text style={styles.headline}>Stay Connected</Text>
             <Text style={styles.desc}>
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s
+              Build your communities by Inviting your families & friends to join it
             </Text>
           </View>
           <View>

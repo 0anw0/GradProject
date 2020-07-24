@@ -10,14 +10,14 @@ import EditRoom from './editRoom'
 
 const roomsStack = createStackNavigator(
     {
-        RoomsList: { screen: RoomsList },
-        ChatScreen: { screen: ChatScreen },
-        CreateRoom: { screen: CreateRoom },
-        RoomMembers: { screen: RoomMembers },
+        ChatScreen,
+        CreateRoom,
+        RoomMembers,
         UploadedMediaStack,
         BubbleStack,
         BotStack,
-        EditRoom: { screen: EditRoom }
+        EditRoom,
+        RoomsList,
     },
     {
         headerMode: 'none'

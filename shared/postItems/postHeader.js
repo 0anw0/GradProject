@@ -20,7 +20,6 @@ export function PostHeader({
   setCommunityModalVisible,
 }) {
   let communityInfo = communities;
-
   if (communityInfo) {
     return (
       <View>
@@ -37,21 +36,21 @@ export function PostHeader({
               }}
             />
           ) : (
-            <Pop
-              dark
-              size={22}
-              item1="Hide"
-              onPress1={() => hidePost(postKey, clearPosts, currentUser)}
-              item2="Report"
-              onPress2={() =>
-                reportPost(postKey, clearPosts, currentUser, postMakerKey)
-              }
-            />
-          )}
+              <Pop
+                dark
+                size={22}
+                item1="Hide"
+                onPress1={() => hidePost(postKey, clearPosts, currentUser)}
+                item2="Report"
+                onPress2={() =>
+                  reportPost(postKey, clearPosts, currentUser, postMakerKey)
+                }
+              />
+            )}
         </View>
         <View style={styles.post}>
           <View style={styles.userDetails}>
-            <Avatar rounded size={50} source={{ userAvatar }} />
+            <Avatar rounded size={50} source={{ uri:userAvatar }} />
             <Text style={styles.userName}>{userName}</Text>
             <View style={styles.communities}>
               {!headingFromCommunity ? (

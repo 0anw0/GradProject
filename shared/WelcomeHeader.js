@@ -7,26 +7,30 @@ import Avatar from "./Avatar";
 export default class WelcomeHeader extends React.Component {
   constructor(props) {
     super(props)
-    this.uid=firebase.auth().currentUser.uid
+    this.uid = firebase.auth().currentUser.uid
     this.state = {
       name: ''
     }
   }
   componentDidMount() {
-    firebase.database().ref(`authenticatedUsers/${this.uid}/fullName`)
-    .once('value', snap =>{
-      this.setState({ name: snap.val()})
-    })
+    firebase.database().ref(`authenticatedUsers/${this.uid}/PersonalInfo/nickName`)
+      .once('value', snap => {
+        this.setState({ name: snap.val() })
+      })
   }
 
   render() {
     return (
       <View style={styles.header}>
-        <Text style={styles.headerHello}>Hello,</Text>
-        <Text style={styles.headerUser}>{this.state.name}</Text>
-        <View
-          style={{ position: "relative", left: Dimensions.get('window').width * 0.27 }}
-        >
+        <View style={{
+          flexDirection: 'row',
+          width: Dimensions.get('window').width * 0.75,
+          height: Dimensions.get('window').height * 0.05
+        }}>
+          <Text style={styles.headerHello}>Hello,</Text>
+          <Text style={styles.headerUser}>{this.state.name}</Text>
+        </View>
+        <View>
           <Avatar
             width={40}
             height={40}
@@ -61,12 +65,12 @@ const styles = StyleSheet.create({
   },
   headerHello: {
     fontWeight: "bold",
-    fontSize: 25,
+    fontSize: 22,
     marginRight: 5,
     color: secondColor,
   },
   headerUser: {
-    fontSize: 25,
+    fontSize: 22,
     color: secondColor,
   },
 });

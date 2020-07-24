@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, Image, StatusBar, StyleSheet } from "react-native";
 import { Button } from "react-native-elements";
-import { TouchableHighlight } from "react-native-gesture-handler";
 import styles from "./styles";
 
 export default class Onboard1 extends React.Component {
@@ -16,11 +15,11 @@ export default class Onboard1 extends React.Component {
             />
           </View>
           <View style={{ alignItems: "center" }}>
-            <Text style={styles.headline}>Create Profile</Text>
+            <Text style={styles.headline}>Invite your Friends</Text>
             <Text style={styles.desc}>
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s
+              Keep in touch with all your family
+              & friends through Communities without
+              being bothered by others
             </Text>
           </View>
           <View>

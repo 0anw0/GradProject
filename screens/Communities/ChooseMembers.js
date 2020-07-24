@@ -1,81 +1,225 @@
 import React from 'react'
-import { View, Text, StatusBar, StyleSheet, FlatList, TouchableOpacity } from 'react-native'
+import {
+    View, Text, StatusBar, Dimensions,
+    StyleSheet, FlatList, TouchableOpacity, ScrollView, Alert
+} from 'react-native'
+import { ListItem, Button } from 'react-native-elements'
 
-import { Avatar } from 'react-native-elements'
 import Header from '../../shared/Header'
 import firebase from '../../services/firebaseConfig'
+import { secondColor } from '../../shared/constants'
+
 
 export default class ChooseMembers extends React.Component {
     constructor(props) {
         super(props)
-        this.navigatate = this.props.navigation.navigate
+        this.navigate = this.props.navigation.navigate
         this.currentUser = firebase.auth().currentUser
+        this.commKey = this.props.navigation.state.params.communityKey
         this.state = {
             authUsers: [],
             selMembers: [],
             selected: false,
+            friends: [],
+            btnLoading: false,
+            loaded: true
         }
     }
 
     componentDidMount() {
-        firebase.database().ref(`authenticatedUsers`).on('value', snap => {
-            var authUsers = []
-            snap.forEach(child => {
-                if (child.key !== this.currentUser.uid) {
-                    authUsers.push({
-                        name: child.val().fullName,
-                        avatar: child.val().avatar,
-                        key: child.key
-                    })
-                }
+        this.getUserFriendsUids()
+    }
+
+    getUserFriendsUids() {
+        var friendsUid = []
+        firebase.database()
+            .ref(`authenticatedUsers/${this.currentUser.uid}/friends`)
+            .on('value', snap => {
+                snap.forEach(child => {
+                    friendsUid.push(child.val().uuid)
+                })
             })
-            this.setState({ authUsers })
+        this.getCommunityMember(this.commKey, friendsUid)
+    }
+
+    getCommunityMember(commKey, friendsUid) {
+        let commMembers = []
+        firebase.database().ref(`communities/${commKey}/members`)
+            .on('value', snap => {
+                snap.forEach(child => {
+                    commMembers.push(child.key)
+                })
+            })
+        this.getUserFriendsInfo(commMembers, friendsUid)
+    }
+
+    getUserFriendsInfo(commMembers, friendsUid) {
+        var friends = this.state.friends
+        var uids = friendsUid
+        uids.forEach(element => {
+            if (element != null && !commMembers.includes(element)) {
+                firebase.database()
+                    .ref(`authenticatedUsers/${element}`).on('value', snap => {
+                        friends.push({
+                            name: snap.val().fullName,
+                            avatar: snap.val().avatar,
+                            key: element,
+                            selected: false,
+                            adminRole: false
+                        })
+                    })
+                this.setState({ friends })
+            }
         })
     }
 
-    selectItem = (user) => {
+    chooseFriend(friend, selected, adminRole) {
+        let friends = this.state.friends
+        let afterSelectionFriends = []
+        for (const child in friends) {
+            if (friend.key == friends[child].key) {
+                afterSelectionFriends.push({
+                    name: friend.name,
+                    avatar: friend.avatar,
+                    key: friend.key,
+                    selected: selected,
+                    adminRole: adminRole
+                })
+            }
+            else {
+                afterSelectionFriends.push(friends[child])
+            }
+        }
+
         this.setState({
-            selMembers: [...this.state.selMembers]
+            friends: afterSelectionFriends
         })
     }
 
-    backScreen = this.props.navigation.getParam('backScreen')
-    goBack = () => {
-        var members = this.state.selMembers
-/*         members.push({
-            avatar: this.currentUser.photoURL,
-            key: this.currentUser.uid,
-            name: this.currentUser.displayName
+    inviteMembers = () => {
+        let { friends } = this.state
+        let selectedNum = 0
+        friends.forEach(child => {
+            if (child.selected == true) {
+                selectedNum++
+            }
         })
- */        if (this.backScreen === "CreateCommunity")
-            this.navigatate('CreateCommunity', { selMembers: this.state.selMembers })
-        else if (this.backScreen === "CommunityMembers")
-            this.navigatate('CommunityMembers', { selMembers: this.state.selMembers })
+        if (selectedNum >= 1) {
+            this.setState({ btnLoading: true, disabled: true })
+
+            try {
+                friends.forEach(child => {
+
+                    if (child.selected == true) {
+                        firebase.database().ref(`communities/${this.commKey}/members/${child.key}`)
+                            .set({ admin: child.adminRole }) //Invite Folder!
+
+                        firebase.database() // Invite Folder!
+                            .ref(`authenticatedUsers/${child.key}/communities/${this.commKey}`)
+                            .set({
+                                admin: child.adminRole
+                            })
+                    }
+                })
+            }
+            catch (e) {
+                console.log('an error occured while inviting a friend to community')
+                this.setState({ btnLoading: false, disabled: false })
+            } finally {
+                this, navigate('CommunityOverview', {
+                    communityKey: this.commKey
+                })
+            }
+
+        } else {
+            Alert.alert('please choose a friend to invite!')
+        }
     }
 
     render() {
-        const renderUser = (item) => (
-            <TouchableOpacity style={[styles.item, { backgroundColor: this.state.selected ? '#DDD' : '#FFF' }]} onPress={() => this.selectItem(item)}>
-                <Avatar rounded size="medium" source={{ uri: item.avatar }} />
-                <View>
-                    <Text style={styles.memberName}>{item.name}</Text>
-                </View>
-            </TouchableOpacity>
-        )
         return (
-            <View style={{ marginTop: StatusBar.currentHeight }}>
+            <View style={{
+                marginTop: StatusBar.currentHeight, margin: 15,
+            }}>
                 <Header
                     title="Choose Members .."
                     icon='done' type='material'
                     onPress={this.goBack}
                 />
-                <FlatList
-                    style={{ padding: 6 }}
-                    data={this.state.authUsers}
-                    extraData={this.state.selected}
-                    keyExtractor={(item) => item.key}
-                    renderItem={({ item }) => renderUser(item)}
-                />
+                <ScrollView style={{ borderRadius: 5 }}>
+                    <FlatList
+                        style={{
+                            borderColor: secondColor,
+                            borderWidth: 1, borderRadius: 10, height: 225,
+                            height: Dimensions.get('window').height * 0.76,
+                        }}
+                        data={this.state.friends}
+                        keyExtractor={(item) => item.key}
+                        renderItem={({ item }) =>
+                            <View style={{ margin: 5 }}>
+                                <TouchableOpacity onPress={() => {
+                                    if (item.selected && !item.adminRole)
+                                        this.chooseFriend(item, false, false)
+                                    else this.chooseFriend(item, true, false)
+                                }}>
+                                    <ListItem
+                                        key={item.key}
+                                        leftAvatar={{ source: { uri: item.avatar } }}
+                                        title={item.name}
+                                        titleStyle={item.selected ?
+                                            { color: secondColor, fontWeight: 'bold' } :
+                                            null}
+
+                                        containerStyle={
+                                            {
+                                                backgroundColor: item.selected ? '#ebe3ff' : null,
+                                                borderRadius: 3
+                                            }
+                                        }
+
+                                        bottomDivider
+                                        rightElement={
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    !item.adminRole ?
+                                                        this.chooseFriend(item, true, true)
+                                                        : this.chooseFriend(item, true, false)
+                                                }}>
+                                                <View
+                                                    style={{
+                                                        borderRadius: 5,
+                                                        borderWidth: item.adminRole ? 1 : null,
+                                                        borderColor: secondColor
+                                                    }}>
+                                                    <Text
+                                                        style={{
+                                                            color: item.adminRole
+                                                                ? secondColor : null,
+                                                            padding: 10,
+                                                            letterSpacing: 2,
+                                                            fontWeight: item.adminRole
+                                                                ? 'bold' : null,
+                                                        }}
+                                                    >admin </Text>
+                                                </View>
+                                            </TouchableOpacity>
+                                        }
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        }
+                    />
+                </ScrollView>
+
+                <View style={{ paddingTop: 10 }}>
+                    <Button
+                        containerStyle={{ backgroundColor: secondColor }}
+                        loading={this.state.btnLoading}
+                        disabled={this.state.disabled}
+                        loadingProps={{ size: 'small' }}
+                        title="Add"
+                        onPress={() => this.inviteMembers()} />
+                </View>
             </View>
         )
     }

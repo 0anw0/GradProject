@@ -22,7 +22,7 @@ export default class NewsFeed extends React.Component {
       loaded: false,
       hasCommunities: true,
       hasPosts: true,
-      announcement: true,
+      announcement: false,
       refreshing: false,
     };
   }
