@@ -1,5 +1,5 @@
 import React from "react";
-import * as firebase from 'firebase'
+import * as firebase from "firebase";
 import { View, Text, Image, StyleSheet, Dimensions } from "react-native";
 import { secondColor, $grey_2, $grey_1 } from "./constants";
 import Avatar from "./Avatar";
@@ -9,8 +9,8 @@ export default class WelcomeHeader extends React.Component {
     super(props)
     this.uid = firebase.auth().currentUser.uid
     this.state = {
-      name: ''
-    }
+      name: "",
+    };
   }
   componentDidMount() {
     firebase.database().ref(`authenticatedUsers/${this.uid}/PersonalInfo/nickName`)
@@ -34,7 +34,9 @@ export default class WelcomeHeader extends React.Component {
           <Avatar
             width={40}
             height={40}
-            uri={firebase.auth().currentUser.photoURL || 'http://placehold.it/45'}
+            uri={
+              firebase.auth().currentUser.photoURL || "http://placehold.it/45"
+            }
             borderWidth={0.8}
             borderColor={secondColor}
           />

@@ -12,6 +12,7 @@ export function CommunityListElements({
   navigate,
 }) {
   return (
+  
     <View style={{ padding: 25 }}>
       {loaded ? (
         hasCommunities ? (

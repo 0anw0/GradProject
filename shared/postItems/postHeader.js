@@ -2,9 +2,10 @@ import React from "react";
 import { View, Text, TouchableOpacity, Alert } from "react-native";
 
 import { deletePost, hidePost, reportPost } from "./deleteEditReport";
-import { Avatar } from "react-native-elements";
-import styles from "./postStyles";
+import {secondColor} from '../constants'
+import Avatar from "../Avatar";
 import Pop from "../PopMenu";
+import styles from "./postStyles";
 
 export function PostHeader({
   postMakerKey,
