@@ -76,7 +76,7 @@ export default class App extends React.Component {
             <TouchableOpacity
               style={styles.item}
               onPress={() => {
-                this.props.setRoomOverviewModalVisible(true , item)
+                this.props.setRoomOverviewModalVisible(true, item);
               }}
             >
               <Avatar

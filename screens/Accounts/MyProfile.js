@@ -233,11 +233,11 @@ export default class MyProfile extends React.Component {
                           borderWidth={0.8}
                           borderColor={secondColor}
                         />
-                        {more(this.state.friends)}
                       </View>
                     );
                   }
                 })}
+                {more(this.state.friends)}
               </View>
             </View>
           </TouchableOpacity>
@@ -306,12 +306,14 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   boxMore: {
-    width: 45,
-    height: 45,
-    backgroundColor: "#FFF",
+    width: 40,
+    height: 40,
+    backgroundColor: $grey_2,
     borderRadius: 48,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 1,
+    borderColor: secondColor,
   },
   editProfile: {
     position: "absolute",

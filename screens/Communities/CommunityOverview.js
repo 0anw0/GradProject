@@ -22,12 +22,13 @@ import Avatar from "../../shared/Avatar";
 import styles from "./communityStyles";
 import RoomsList from "./Modals/RoomsList";
 import RoomOverview from "./Modals/RoomOverview";
+import RoomMembers from "./Modals/RoomMembers";
 
 export default class CommunityOverview extends React.Component {
   constructor(props) {
     super(props);
-    this.navigate = this.props.navigation.navigate
-    this.communityKey = this.props.navigation.state.params.communityKey
+    this.navigate = this.props.navigation.navigate;
+    this.communityKey = this.props.navigation.state.params.communityKey;
     this.state = {
       communityDetails: {},
       posts: [],
@@ -37,7 +38,8 @@ export default class CommunityOverview extends React.Component {
       communityKey: "",
       roomsModalVisible: false,
       roomOverviewModalVisible: false,
-      selectedRoom: {}
+      roomMembersModalVisible: false,
+      selectedRoom: {},
     };
   }
 
@@ -48,12 +50,31 @@ export default class CommunityOverview extends React.Component {
   setRoomOverviewModalVisible = (visible, room) => {
     this.setState({
       roomOverviewModalVisible: visible,
-      selectedRoom: room
+      selectedRoom: room,
     });
-  }
+  };
+
+  setRoomMembersModalVisible = (visible, room) => {
+    this.setState({ roomMembersModalVisible: visible, selectedRoom: room });
+  };
+
+  setVisibilityOffRoomMembers = () => {
+    this.setState({
+      roomOverviewModalVisible: false,
+      roomsModalVisible: false,
+      roomMembersModalVisible: false,
+    });
+  };
+
+  setVisibilityOffRoomOverview = () => {
+    this.setState({
+      roomOverviewModalVisible: false,
+      roomsModalVisible: false,
+    });
+  };
 
   componentDidMount() {
-    let { communityKey } = this.props.navigation.state.params
+    let { communityKey } = this.props.navigation.state.params;
     this.setState({ communityKey });
     listenForPosts(
       true,
@@ -62,7 +83,6 @@ export default class CommunityOverview extends React.Component {
       "",
       this.changehasPostsState,
       this.uuid
-
     );
     this.getCommunityDetails();
   }
@@ -83,7 +103,7 @@ export default class CommunityOverview extends React.Component {
 
   updatePosts = (value) => {
     this.setState({ posts: value, loaded: true });
-    console.log('this.state.posts ', this.state.posts)
+    console.log("this.state.posts ", this.state.posts);
   };
 
   changehasPostsState = () => {
@@ -117,11 +137,11 @@ export default class CommunityOverview extends React.Component {
   };
 
   navToEditCommunity = () => {
-    this.navigate('EditCommunity', {
+    this.navigate("EditCommunity", {
       communityDetails: this.state.communityDetails,
-      communityKey: this.state.communityKey
-    })
-  }
+      communityKey: this.state.communityKey,
+    });
+  };
 
   render() {
     return (
@@ -154,11 +174,26 @@ export default class CommunityOverview extends React.Component {
           }}
         >
           <RoomOverview
+            setRoomMembersModalVisible={this.setRoomMembersModalVisible}
+            closeModals={() => this.setVisibilityOffRoomOverview()}
             navigate={this.navigate}
             communityKey={this.state.communityKey}
             selectedRoom={this.state.selectedRoom}
           />
+        </SlideModal>
 
+        <SlideModal
+          closeModal={() => this.setState({ roomMembersModalVisible: false })}
+          modalVisible={this.state.roomMembersModalVisible}
+          setModalVisible={() => this.setRoomMembersModalVisible(false)}
+        >
+          <RoomMembers
+            closeModal={() => this.setState({ roomMembersModalVisible: false })}
+            navigate={this.navigate}
+            communityKey={this.state.communityKey}
+            roomKey={this.state.selectedRoom}
+            selectedRoom={this.state.selectedRoom}
+          />
         </SlideModal>
 
         <MiddleFloatingIcon
@@ -219,8 +254,10 @@ export default class CommunityOverview extends React.Component {
                 </Text>
               </View>
 
-              <TouchableOpacity onPress={() => this.navToEditCommunity()}
-                style={styles.editCommunity}>
+              <TouchableOpacity
+                onPress={() => this.navToEditCommunity()}
+                style={styles.editCommunity}
+              >
                 <Icon
                   name="edit"
                   type="feather"

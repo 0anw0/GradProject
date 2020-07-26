@@ -163,7 +163,7 @@ export default class MyProfile extends React.Component {
         >
           <View>
             <View style={styles.titleBox}>
-              <Text style={styles.titleText}>Your Friends</Text>
+              <Text style={styles.titleText}>Friends</Text>
             </View>
             <View style={styles.boxAvatar}>
               {this.state.friends.map((item, index) => {
@@ -177,7 +177,6 @@ export default class MyProfile extends React.Component {
                         borderWidth={0.8}
                         borderColor={secondColor}
                       />
-                      {more(this.state.friends)}
                     </View>
                   );
                 }
@@ -193,7 +192,7 @@ export default class MyProfile extends React.Component {
         >
           <View>
             <View style={styles.titleBox}>
-              <Text style={styles.titleText}>Your communities</Text>
+              <Text style={styles.titleText}>Communities</Text>
             </View>
             <View style={styles.boxAvatar}>
               {this.state.communities.map((item, index) => {
